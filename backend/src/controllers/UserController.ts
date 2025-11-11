@@ -76,48 +76,6 @@ export const patchUser: RequestHandler = async (req, res, next) => {
   }
 }
 
-export const postUser: RequestHandler = async (req, res, next) => {
-  // VALIDATE POST BODY
-  const validated = userValidatorSchema.safeParse(req.body);
-
-  if (!validated.success) {
-    return validatorError(res, validated.error)
-  }
-
-  const { first_name, last_name, password, email } = validated.data;
-
-  try {
-    const newUser = await createUser({
-      first_name,
-      last_name,
-      password,
-      email
-    })
-
-    return res.status(201).json({
-      success: true,
-      data: newUser
-    });
-
-  } catch (error) {
-    if (error instanceof DrizzleQueryError) {
-      const cause = error.cause as any;
-      const code = cause?.code;
-
-      if (code === "23505") {
-        return res.status(400).json({
-          success: false,
-          errors: {
-            "email": "Email already exists"
-          }
-        });
-      }
-    }
-    console.log(error);
-    next();
-  }
-}
-
 export const deleteUserRoute: RequestHandler = async (req, res, next) => {
   // VALIDATE PARAMS
   const validatedParams = routeParam.safeParse(req.params);
@@ -136,8 +94,7 @@ export const deleteUserRoute: RequestHandler = async (req, res, next) => {
       data: {
         id: Number(id),
       }
-    })
-
+    });
   } catch (error) {
     console.log(error);
     next();
