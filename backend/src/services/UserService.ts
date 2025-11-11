@@ -11,6 +11,12 @@ export const findUser = (id: Number) => {
   });
 }
 
+export const findUserByEmail = (email: string) => {
+  return db.query.users.findFirst({
+    where: (users, { eq }) => eq(users.email, email)
+  });
+}
+
 export const createUser = async (data: userValidator) => {
   return db.insert(users).values({
     email: data.email,

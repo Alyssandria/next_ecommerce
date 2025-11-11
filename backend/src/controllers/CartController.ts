@@ -86,7 +86,8 @@ const deleteParams = z.object({
     }
     return val;
   }, z.array(z.coerce.number())),
-})
+});
+
 export const deleteCartRoute: RequestHandler = async (req, res, next) => {
   // VALIDATE PARAMS
   const validate = deleteParams.safeParse(req.query);
