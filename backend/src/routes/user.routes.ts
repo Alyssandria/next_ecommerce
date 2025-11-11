@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { getUser } from "../controllers/UserController";
+import { deleteUserRoute, getUser, patchUser, postUser } from "../controllers/UserController";
 
-export const router = Router();
+export const userRouter = Router();
 
-router.get('/users/:id', getUser);
-router.post('/users')
-
-
+userRouter.get('/:id', getUser);
+userRouter.post('/', postUser)
+userRouter.patch('/:id', patchUser)
+userRouter.delete('/:id', deleteUserRoute)

@@ -1,7 +1,10 @@
 import express, { json } from "express";
-import { router } from "./routes/user.routes";
+import { userRouter } from "./routes/user.routes";
+import { cartRouter } from "./routes/cart.routes";
 
 export const app = express();
 
 app.use(json());
-app.use('/api/v1', router);
+
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/carts', cartRouter);
