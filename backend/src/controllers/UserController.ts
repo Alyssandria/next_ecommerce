@@ -5,11 +5,11 @@ import { validatorError } from "../services/ErrorService";
 import { userValidatorSchema, userValidatorSchemaPartial } from "../validators/User";
 import { DrizzleQueryError } from "drizzle-orm";
 
-const userRouteParam = z.object({
+export const routeParam = z.object({
   id: z.string().regex(/^\d+$/, "Invalid Type. Must be a valid user id")
 })
-export const getUser: RequestHandler<z.infer<typeof userRouteParam>> = async (req, res, next) => {
-  const validatedParams = userRouteParam.safeParse(req.params);
+export const getUser: RequestHandler<z.infer<typeof routeParam>> = async (req, res, next) => {
+  const validatedParams = routeParam.safeParse(req.params);
 
   if (!validatedParams.success) {
     return validatorError(res, validatedParams.error);
@@ -39,7 +39,7 @@ export const getUser: RequestHandler<z.infer<typeof userRouteParam>> = async (re
 
 export const patchUser: RequestHandler = async (req, res, next) => {
   // VALIDATION
-  const validatedParams = userRouteParam.safeParse(req.params);
+  const validatedParams = routeParam.safeParse(req.params);
 
   if (!validatedParams.success) {
     return validatorError(res, validatedParams.error);
@@ -56,7 +56,7 @@ export const patchUser: RequestHandler = async (req, res, next) => {
   const { first_name, last_name, password, email } = validated.data;
 
   try {
-    const updated = await updateUser(Number(id), {
+    await updateUser(Number(id), {
       first_name,
       last_name,
       password,
@@ -113,13 +113,14 @@ export const postUser: RequestHandler = async (req, res, next) => {
         });
       }
     }
+    console.log(error);
     next();
   }
 }
 
 export const deleteUserRoute: RequestHandler = async (req, res, next) => {
   // VALIDATE PARAMS
-  const validatedParams = userRouteParam.safeParse(req.params);
+  const validatedParams = routeParam.safeParse(req.params);
 
   if (!validatedParams.success) {
     return validatorError(res, validatedParams.error);
@@ -128,7 +129,7 @@ export const deleteUserRoute: RequestHandler = async (req, res, next) => {
   const { id } = validatedParams.data
 
   try {
-    const deleted = await deleteUser(Number(id));
+    await deleteUser(Number(id));
 
     return res.json({
       success: true,

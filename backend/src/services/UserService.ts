@@ -17,7 +17,11 @@ export const createUser = async (data: userValidator) => {
     firstName: data.first_name,
     lastName: data.last_name,
     password: await bcrypt.hash(data.password, 12),
-  }).returning();
+  }).returning({
+    firstName: users.firstName,
+    lastName: users.lastName,
+    email: users.email,
+  });
 }
 
 export const updateUser = async (id: number, data: userValidatorPartial) => {

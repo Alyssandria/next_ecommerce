@@ -1,8 +1,10 @@
 import { RequestHandler } from "express";
-import { cartValidatorSchema } from "../validators/Cart";
-import { drizzleError, validatorError } from "../services/ErrorService";
-import { createCart } from "../services/CartService";
+import { cartValidatorSchema, cartValidatorSchemaPartial } from "../validators/Cart";
+import { validatorError } from "../services/ErrorService";
+import { createCart, deleteCart, updateCart } from "../services/CartService";
 import { DrizzleQueryError } from "drizzle-orm";
+import { routeParam } from "./UserController";
+import z from "zod";
 
 export const postCart: RequestHandler = async (req, res, next) => {
   // VALIDATE POST BODY
@@ -38,4 +40,83 @@ export const postCart: RequestHandler = async (req, res, next) => {
     console.log(error);
     next();
   }
+}
+
+export const patchCart: RequestHandler = async (req, res, next) => {
+  // VALIDATE PATCHBODY
+  const validatedBody = cartValidatorSchemaPartial.safeParse(req.body);
+
+  const validatedParams = routeParam.safeParse(req.params);
+
+  if (!validatedParams.success) {
+    return validatorError(res, validatedParams.error);
+  }
+
+  const { id } = req.params;
+
+  if (!validatedBody.success) {
+    return validatorError(res, validatedBody.error);
+  }
+
+  const { product_id, quantity, user_id } = validatedBody.data;
+
+  try {
+    await updateCart(Number(id), {
+      quantity,
+      product_id,
+      user_id
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        id,
+      }
+    })
+  } catch (error) {
+    console.log(error);
+    next();
+  }
+}
+
+const deleteParams = z.object({
+  ids: z.preprocess((val) => {
+    if (!Array.isArray(val)) {
+      return [val];
+    }
+    return val;
+  }, z.array(z.coerce.number())),
+})
+export const deleteCartRoute: RequestHandler = async (req, res, next) => {
+  // VALIDATE PARAMS
+  const validate = deleteParams.safeParse(req.query);
+
+  if (!validate.success) {
+    return validatorError(res, validate.error);
+  }
+  const { ids } = validate.data
+
+  try {
+    const deleted = await deleteCart(ids);
+
+    if (deleted.length === 0) {
+      return res.json({
+        success: false,
+        error: {
+          ids: "Invalid or ids cannot be found",
+        }
+      })
+    }
+
+    if (!deleted.length)
+      return res.json({
+        success: true,
+        data: ids
+      });
+
+  } catch (error) {
+    console.log(error);
+    next();
+  }
+
 }
