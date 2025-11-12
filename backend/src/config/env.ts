@@ -12,6 +12,7 @@ const envVars = z.object({
   DB_PORT: z.string().transform(val => Number(val)),
   SERVER_PORT: z.string(),
   APP_ENV: z.string(),
+  APP_URL: z.string(),
   JWT_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),
 });
