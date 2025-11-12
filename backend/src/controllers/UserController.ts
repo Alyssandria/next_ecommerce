@@ -1,9 +1,8 @@
 import { RequestHandler } from "express";
 import z from "zod";
-import { createUser, deleteUser, findUser, updateUser } from "../services/UserService";
+import { deleteUser, findUser, updateUser } from "../services/UserService";
 import { validatorError } from "../services/ErrorService";
-import { userValidatorSchema, userValidatorSchemaPartial } from "../validators/User";
-import { DrizzleQueryError } from "drizzle-orm";
+import { userValidatorSchemaPartial } from "../validators/User";
 
 export const routeParam = z.object({
   id: z.string().regex(/^\d+$/, "Invalid Type. Must be a valid user id")

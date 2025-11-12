@@ -13,7 +13,7 @@ export const auth: RequestHandler = async (req: AuthenticatedRequest, res, next)
   }
 
   try {
-    const user = await jwt.verify(token, env.app.APP_JWT_SECRET) as { email: string };
+    const user = jwt.verify(token, env.JWT_SECRET) as { email: string };
     req.user = user;
     next();
   } catch (error) {

@@ -6,9 +6,9 @@ services:
     ports: 
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: ${LOCAL_DB_PASSWORD}
-      POSTGRES_DB: ${LOCAL_DB_DATABASE}
-      POSTGRES_USER: ${LOCAL_DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
 
   adminer:
     image: adminer

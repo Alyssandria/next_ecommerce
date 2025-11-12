@@ -8,6 +8,7 @@ import { env } from "../config/env";
 import { userValidatorSchema } from "../validators/User";
 import { DrizzleQueryError } from "drizzle-orm";
 import { AuthenticatedRequest } from "../types";
+import { db } from "../config/db/db";
 
 export const login: RequestHandler = async (req, res, next) => {
   // VALIDATE POST BODY
@@ -33,8 +34,8 @@ export const login: RequestHandler = async (req, res, next) => {
       });
     }
 
-    const token = jwt.sign({ email }, env.app.APP_JWT_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ email }, env.app.APP_JWT_REFRESH_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ email }, env.JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ email }, env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -52,7 +53,7 @@ export const login: RequestHandler = async (req, res, next) => {
   }
 }
 
-export const refresh: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+export const refresh: RequestHandler = async (req: AuthenticatedRequest, res) => {
   const { refreshToken } = req.cookies;
 
   if (!refreshToken) {
@@ -65,14 +66,13 @@ export const refresh: RequestHandler = async (req: AuthenticatedRequest, res, ne
   }
 
   try {
-    const verify = jwt.verify(refreshToken, env.app.APP_JWT_REFRESH_SECRET) as { email: string };
+    const verify = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as { email: string };
 
-    const token = jwt.sign({ email: verify.email }, env.app.APP_JWT_SECRET);
+    const token = jwt.sign({ email: verify.email }, env.JWT_SECRET);
 
     return res.json({ token });
 
   } catch (error) {
-    console.log(error);
     return res.status(401).json({
       success: false,
       error: {
