@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { deleteCartRoute, patchCart, postCart } from "../controllers/CartController";
+import { auth } from "../middleware/auth";
 
 export const cartRouter = Router();
 
-cartRouter.post('/', postCart);
-cartRouter.patch('/:id', patchCart);
-cartRouter.delete('/', deleteCartRoute);
+cartRouter.post('/', auth, postCart);
+cartRouter.patch('/:id', auth, patchCart);
+cartRouter.delete('/', auth, deleteCartRoute);

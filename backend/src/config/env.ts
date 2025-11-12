@@ -1,7 +1,7 @@
 import z from "zod";
 import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 type localVars = {
   LOCAL_DB_USER: string,
