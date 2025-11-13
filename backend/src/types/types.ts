@@ -1,6 +1,10 @@
 import { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
-import { $ZodFlattenedError } from "zod/v4/core";
+import z from "zod"
+
+export const routeParam = z.object({
+  id: z.string().regex(/^\d+$/, "Invalid Type. Must be a valid user id").transform(val => Number(val))
+});
 
 export interface credentials extends JwtPayload {
   email: string,
@@ -8,4 +12,3 @@ export interface credentials extends JwtPayload {
 export interface AuthenticatedRequest extends Request {
   user?: credentials
 }
-

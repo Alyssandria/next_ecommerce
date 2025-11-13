@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
-import { AuthenticatedRequest } from "../types";
+import { AuthenticatedRequest } from "../types/types";
 
 
 export const auth: RequestHandler = async (req: AuthenticatedRequest, res, next) => {

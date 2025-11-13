@@ -3,8 +3,8 @@ import { cartValidatorSchema, cartValidatorSchemaPartial } from "../validators/C
 import { validatorError } from "../services/ErrorService";
 import { createCart, deleteCart, updateCart } from "../services/CartService";
 import { DrizzleQueryError } from "drizzle-orm";
-import { routeParam } from "./UserController";
 import z from "zod";
+import { routeParam } from "../types/types";
 
 export const postCart: RequestHandler = async (req, res, next) => {
   // VALIDATE POST BODY

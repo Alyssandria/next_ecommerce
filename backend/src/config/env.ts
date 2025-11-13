@@ -15,6 +15,7 @@ const envVars = z.object({
   APP_URL: z.string(),
   JWT_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),
+  BASE_PRODUCTS_API: z.string(),
 });
 
 export const env = envVars.parse(process.env);

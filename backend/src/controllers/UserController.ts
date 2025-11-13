@@ -1,13 +1,10 @@
 import { RequestHandler } from "express";
-import z from "zod";
 import { deleteUser, findUser, updateUser } from "../services/UserService";
 import { validatorError } from "../services/ErrorService";
 import { userValidatorSchemaPartial } from "../validators/User";
+import { routeParam } from "../types/types";
 
-export const routeParam = z.object({
-  id: z.string().regex(/^\d+$/, "Invalid Type. Must be a valid user id")
-})
-export const getUser: RequestHandler<z.infer<typeof routeParam>> = async (req, res, next) => {
+export const getUser: RequestHandler = async (req, res, next) => {
   const validatedParams = routeParam.safeParse(req.params);
 
   if (!validatedParams.success) {
@@ -17,7 +14,7 @@ export const getUser: RequestHandler<z.infer<typeof routeParam>> = async (req, r
   const { id } = validatedParams.data
 
   try {
-    const user = await findUser(Number(id));
+    const user = await findUser(id);
     if (!user) {
       return res.status(404).json({
         success: false,

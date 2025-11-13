@@ -7,8 +7,8 @@ import jwt from "jsonwebtoken"
 import { env } from "../config/env";
 import { userValidatorSchema } from "../validators/User";
 import { DrizzleQueryError } from "drizzle-orm";
-import { AuthenticatedRequest } from "../types";
 import { db } from "../config/db/db";
+import { AuthenticatedRequest } from "../types/types";
 
 export const login: RequestHandler = async (req, res, next) => {
   // VALIDATE POST BODY
