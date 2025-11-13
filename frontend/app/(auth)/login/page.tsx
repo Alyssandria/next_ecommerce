@@ -2,6 +2,7 @@
 import { AuthInput } from "@/components/ui/auth-input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import { fetchApi } from "@/lib/utils";
 import { loginSchema, LoginValidator } from "@/lib/validations/authValidators";
 import { ApiResponse } from "@/types";
@@ -9,9 +10,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function LoginPage() {
 
+  const { setItem } = useLocalStorage();
 
   const form = useForm<LoginValidator>({
     resolver: zodResolver(loginSchema),
