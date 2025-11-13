@@ -5,13 +5,17 @@ import { authRouter } from "./routes/auth.routes";
 import cookieParser from "cookie-parser"
 import cors from "cors";
 import { env } from "./config/env";
-
 export const app = express();
 
-app.use(json());
+app.use((req, res, next) => {
+  console.log("Incoming Origin:", req.headers.origin);
+  next();
+});
 app.use(cors({
-  origin: env.APP_URL
+  origin: env.APP_URL,
+  credentials: true
 }));
+app.use(json());
 app.use(cookieParser());
 
 app.use('/api/v1/users', userRouter);
