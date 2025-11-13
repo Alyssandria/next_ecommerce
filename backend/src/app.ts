@@ -5,12 +5,10 @@ import { authRouter } from "./routes/auth.routes";
 import cookieParser from "cookie-parser"
 import cors from "cors";
 import { env } from "./config/env";
+import { productRouter } from "./routes/products.routes";
+
 export const app = express();
 
-app.use((req, res, next) => {
-  console.log("Incoming Origin:", req.headers.origin);
-  next();
-});
 app.use(cors({
   origin: env.APP_URL,
   credentials: true
@@ -21,3 +19,4 @@ app.use(cookieParser());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/carts', cartRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/products', productRouter);
