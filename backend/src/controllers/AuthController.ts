@@ -28,8 +28,16 @@ export const login: RequestHandler = async (req, res, next) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({
         success: false,
-        error: {
-          email: "The credentials provided does not match any in our system"
+        errors: {
+          global: false,
+          form: {
+            fieldErrors: {
+              email: [
+                "The credentials provided does not match any in our system"
+              ]
+            }
+
+          }
         }
       });
     }
@@ -44,7 +52,10 @@ export const login: RequestHandler = async (req, res, next) => {
     });
 
     res.json({
-      token
+      success: true,
+      data: {
+        token
+      }
     });
 
   } catch (error) {
@@ -116,7 +127,14 @@ export const register: RequestHandler = async (req, res, next) => {
         return res.status(400).json({
           success: false,
           errors: {
-            "email": "Email already exists"
+            global: false,
+            form: {
+              fieldErrors: {
+                "email": [
+                  "Email already exists"
+                ]
+              }
+            }
           }
         });
       }
