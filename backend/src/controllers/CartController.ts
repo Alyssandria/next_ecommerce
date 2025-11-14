@@ -1,22 +1,45 @@
 import { RequestHandler } from "express";
 import { cartValidatorSchema, cartValidatorSchemaPartial } from "../validators/Cart";
 import { validatorError } from "../services/ErrorService";
-import { createCart, deleteCart, updateCart } from "../services/CartService";
+import { createCart, deleteCart, getCarts, updateCart } from "../services/CartService";
 import { DrizzleQueryError } from "drizzle-orm";
 import z from "zod";
-import { routeParam } from "../types/types";
+import { AuthenticatedRequest, routeParam } from "../types/types";
 
-export const postCart: RequestHandler = async (req, res, next) => {
+
+export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+
+  if (!req.user) {
+    return res.sendStatus(403);
+  }
+
+  try {
+    const cartItems = await getCarts(req.user.id);
+    return res.json({
+      success: true,
+      data: cartItems
+    })
+  } catch (error) {
+    next();
+  }
+}
+
+export const postCart: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+  if (!req.user) {
+    return res.sendStatus(403);
+  }
+
   // VALIDATE POST BODY
-
-  const validated = cartValidatorSchema.safeParse(req.body);
+  const validated = cartValidatorSchema.omit({ user_id: true }).safeParse(req.body);
 
   if (!validated.success) {
     return validatorError(res, validated.error);
   }
-
   try {
-    const newCart = await createCart(validated.data);
+    const newCart = await createCart({
+      ...validated.data,
+      user_id: req.user.id
+    });
 
     return res.status(201).json({
       success: true,

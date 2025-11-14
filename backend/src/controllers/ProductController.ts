@@ -20,7 +20,6 @@ const getProductsRouteQuery = z.object({
 });
 
 export const getProducts: RequestHandler = async (req, res) => {
-
   const validated = getProductsRouteQuery.safeParse(req.query);
 
   if (!validated.success) {
@@ -36,7 +35,6 @@ export const getProducts: RequestHandler = async (req, res) => {
 }
 
 export const getProduct: RequestHandler = async (req, res) => {
-
   const validated = routeParam.safeParse(req.params);
 
   if (!validated.success) {

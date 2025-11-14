@@ -8,7 +8,7 @@ import { env } from "../config/env";
 import { userValidatorSchema } from "../validators/User";
 import { DrizzleQueryError } from "drizzle-orm";
 import { db } from "../config/db/db";
-import { AuthenticatedRequest } from "../types/types";
+import { AuthenticatedRequest, credentials } from "../types/types";
 
 export const login: RequestHandler = async (req, res, next) => {
   // VALIDATE POST BODY
@@ -42,8 +42,8 @@ export const login: RequestHandler = async (req, res, next) => {
       });
     }
 
-    const token = jwt.sign({ email }, env.JWT_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ email }, env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, email }, env.JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ id: user.id, email }, env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -77,9 +77,9 @@ export const refresh: RequestHandler = async (req: AuthenticatedRequest, res) =>
   }
 
   try {
-    const verify = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as { email: string };
+    const verify = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as credentials;
 
-    const token = jwt.sign({ email: verify.email }, env.JWT_SECRET);
+    const token = jwt.sign({ id: verify.id, email: verify.email }, env.JWT_SECRET);
 
     return res.json({ token });
 

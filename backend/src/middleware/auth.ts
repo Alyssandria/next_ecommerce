@@ -1,7 +1,8 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
-import { AuthenticatedRequest } from "../types/types";
+import { AuthenticatedRequest, credentials } from "../types/types";
+import { findUser } from "../services/UserService";
 
 
 export const auth: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
@@ -13,7 +14,14 @@ export const auth: RequestHandler = async (req: AuthenticatedRequest, res, next)
   }
 
   try {
-    const user = jwt.verify(token, env.JWT_SECRET) as { email: string };
+    const verify = jwt.verify(token, env.JWT_SECRET) as credentials;
+
+    console.log(verify);
+    const user = await findUser(verify.id);
+
+    if (!user) {
+      return res.sendStatus(403);
+    }
     req.user = user;
     next();
   } catch (error) {

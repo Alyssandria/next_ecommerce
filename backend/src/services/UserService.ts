@@ -1,4 +1,5 @@
 
+import { PgRelationalQuery } from "drizzle-orm/pg-core/query-builders/query";
 import { db } from "../config/db/db";
 import { users } from "../config/db/schema";
 import { userValidatorPartial, type userValidator } from "../validators/User";
@@ -41,4 +42,8 @@ export const updateUser = async (id: number, data: userValidatorPartial) => {
 
 export const deleteUser = async (id: number) => {
   return db.delete(users).where(eq(users.id, id));
+}
+
+export const getUserCarts = async (id: string) => {
+  return users;
 }

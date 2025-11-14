@@ -1,7 +1,9 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "../config/db/db";
 import { carts } from "../config/db/schema";
 import { cartValidatorPartial, type cartValidator } from "../validators/Cart";
+import { fetchProductsById } from "./ProductService";
+import { env } from "../config/env";
 
 export const createCart = (data: cartValidator) => {
   return db.insert(carts).values({
@@ -29,4 +31,32 @@ export const updateCart = (id: number, data: cartValidatorPartial) => {
 
 export const deleteCart = (ids: number[]) => {
   return db.delete(carts).where(inArray(carts.id, ids)).returning();
+}
+
+export const getCarts = async (userId: number) => {
+  const items = await db.query.carts.findMany({
+    where: ((carts, { eq }) => eq(carts.userId, userId))
+  });
+
+  const promises = await fetchProductsById(items.map(el => el.productId))
+
+  const json = await Promise.all(promises.map(async (res) => {
+    if (res.status === "fulfilled") {
+      return res.value.json();
+    }
+
+    return null;
+  })) as ({ id: number } | null)[];
+
+  const res = json.map(el => {
+    if (!el) return el;
+    const quantity = items.find(x => el.id === x.productId)!.quantity;
+    return {
+      quantity,
+      productData: el
+    }
+  });
+
+  return res;
+
 }

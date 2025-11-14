@@ -21,3 +21,13 @@ export const fetchProduct = async (id: number) => {
 
   return await item.json();
 }
+
+export const fetchProductsById = async (ids: number[]) => {
+  const reqs: Promise<Response>[] = [];
+
+  for (const id of ids) {
+    reqs.push(fetch(`${env.BASE_PRODUCTS_API}/${id}`));
+  }
+
+  return Promise.allSettled(reqs);
+}

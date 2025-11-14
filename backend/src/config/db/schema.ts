@@ -11,8 +11,8 @@ const helper = {
 export const users = pgTable(
   'users',
   {
-    firstName: varchar("first_name", { length: 256 }),
-    lastName: varchar("last_name", { length: 256 }),
+    firstName: varchar("first_name", { length: 256 }).notNull(),
+    lastName: varchar("last_name", { length: 256 }).notNull(),
     email: varchar("email", { length: 256 }).unique().notNull(),
     password: varchar("password", { length: 64 }).notNull(),
     ...helper
@@ -21,8 +21,8 @@ export const users = pgTable(
 
 export const carts = pgTable('cart_items', {
   userId: integer("user_id").references(() => users.id),
-  productId: integer("product_id"),
-  quantity: integer("quantity"),
+  productId: integer("product_id").notNull(),
+  quantity: integer("quantity").notNull(),
   ...helper
 }, (t) => [
   uniqueIndex('uniqueUserCartItem').on(t.userId, t.productId)
