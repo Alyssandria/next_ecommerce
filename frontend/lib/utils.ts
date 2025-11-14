@@ -15,3 +15,18 @@ export function fetchApi(route: string, opts?: RequestInit) {
     ...opts
   });
 }
+
+export function formatPrice(price: number) {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(price)
+    ;
+}
+
+export function calculateOriginalPrice(price: number, discount: number) {
+  return (((discount / 100) * price) + price);
+
+}
