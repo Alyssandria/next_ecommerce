@@ -68,30 +68,17 @@ export const refresh: RequestHandler = async (req: AuthenticatedRequest, res) =>
   const { refreshToken } = req.cookies;
 
   if (!refreshToken) {
-    return res.status(401).json({
-      success: false,
-      error: {
-        "_global": "Invalid or unauthorized token",
-      }
-    });
+    return res.sendStatus(403);
   }
 
   try {
     const verify = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as credentials;
 
     const token = jwt.sign({ id: verify.id, email: verify.email }, env.JWT_SECRET);
-
     return res.json({ token });
-
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      error: {
-        "_global": "Invalid or unauthorized token",
-      }
-    });
+    return res.sendStatus(403);
   }
-
 }
 
 
@@ -143,4 +130,10 @@ export const register: RequestHandler = async (req, res, next) => {
     console.log(error);
     next();
   }
+}
+
+export const logout: RequestHandler = (req, res, next) => {
+  res.clearCookie("refreshToken");
+  return res.sendStatus(200);
+
 }

@@ -25,6 +25,7 @@ export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, ne
 }
 
 export const postCart: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+  console.log(req.body);
   if (!req.user) {
     return res.sendStatus(403);
   }

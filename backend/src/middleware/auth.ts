@@ -25,6 +25,6 @@ export const auth: RequestHandler = async (req: AuthenticatedRequest, res, next)
     req.user = user;
     next();
   } catch (error) {
-    return res.sendStatus(403);
+    return res.sendStatus(401);
   }
 }

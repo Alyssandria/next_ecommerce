@@ -24,5 +24,16 @@ export const useLocalStorage = () => {
     }
   }
 
-  return { getItem, setItem };
+
+  const deleteItem = (key: string) => {
+    try {
+      window.localStorage.removeItem(key);
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong, please try again later!");
+      return;
+    }
+  }
+
+  return { getItem, setItem, deleteItem };
 }

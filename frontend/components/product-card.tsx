@@ -9,10 +9,12 @@ import Image from "next/image";
 import { ProductRating } from "./product-rating";
 import { calculateOriginalPrice, formatPrice } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { AddToCart } from "./add-to-cart";
 
 
 interface ProductCardProps extends ComponentProps<"div"> {
   data: Product
+  onCartAdd?: () => void;
 }
 export const ProductCard = ({ data }: ProductCardProps) => {
   return (
@@ -23,7 +25,7 @@ export const ProductCard = ({ data }: ProductCardProps) => {
         </div>
         <Image src={data.thumbnail} width={800} height={600} alt="Product Image" />
         <div className="absolute flex items-center justify-center left-0 bottom-6 w-full px-6">
-          <Button className="w-full p-6">Add to Cart</Button>
+          <AddToCart productID={data.id}>Add to cart</AddToCart>
         </div>
       </CardContent>
       <CardFooter className="flex flex-col items-start">
