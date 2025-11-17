@@ -1,12 +1,8 @@
 import { Product } from "@/types";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { ComponentProps } from "react";
 import Image from "next/image";

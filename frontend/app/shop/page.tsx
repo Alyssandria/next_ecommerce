@@ -1,48 +1,82 @@
 "use client";
 
 import { ProductCard } from "@/components/product-card";
-import { fetchApi } from "@/lib/utils";
-import { ApiResponse, Product } from "@/types";
-import { useQuery, } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useProducts } from "@/hooks/use-products";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 export default function ShopPage() {
-  const query = useQuery({
-    queryKey: ['products'],
-    queryFn: async () => {
-      const res = await fetchApi('/products');
+  const { isFetchingNextPage, error, isPending, data, fetchNextPage, hasNextPage } = useProducts();
+  const scrollableRef = useRef<HTMLDivElement | null>(null);
 
-      const json = await res.json() as ApiResponse<null>;
+  const products = data ? data.pages.flatMap(page => page.products) : [];
+  const virtualizer = useVirtualizer(
+    {
+      count: hasNextPage ? products.length + 1 : products.length,
+      getScrollElement: () => scrollableRef.current,
+      estimateSize: () => 550,
+      overscan: 5
+    });
 
-      if (!json.success) {
-        throw new Error("testing");
-      }
-
-      const items = json.data as { limit: number, products: Product[], skip: number, total: number }
-      return items;
-    }
-  })
+  const virtualItems = virtualizer.getVirtualItems();
 
   useEffect(() => {
-    if (query.error) {
-      toast.error("Something went wrong, Please try again later");
+    if (error) {
+      setTimeout(() => toast.error("Something happened, please try again later"));
     }
-  }, [query.error]);
+    const lastItem = virtualItems[virtualItems.length - 1];
 
-  if (query.isPending) {
+    if (!lastItem) return;
+
+    if (
+      hasNextPage && !isFetchingNextPage && lastItem.index === products.length
+    ) {
+      fetchNextPage();
+    }
+  }, [
+    error,
+    virtualItems,
+    hasNextPage,
+    products.length,
+    isFetchingNextPage,
+    fetchNextPage
+  ]);
+
+
+  if (isPending) {
     return <div>Loading....</div>
   }
 
-  if (query.error) {
+  if (error) {
     return <div>Error</div>
   }
+
+
   return (
-    <div>
-      {query.data?.products.map(el => (
-        <ProductCard data={el} key={el.id} />
-      ))}
-      Hello from shop
+    <div
+      ref={scrollableRef}
+      className="max-h-screen overflow-y-auto"
+    >
+      <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
+        {virtualizer.getVirtualItems().map(item => {
+          const isLoaderRow = item.index >= products.length - 1;
+
+          if (isLoaderRow) return null;
+
+          return (
+            <div key={item.key}
+              className="absolute top-0 left-0 w-full"
+              style={{
+                height: `${item.size}px`,
+                transform: `translateY(${item.start}px)`
+              }}>
+              <ProductCard data={products[item.index]} />
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
