@@ -16,7 +16,7 @@ interface ProductCardProps extends ComponentProps<"div"> {
   data: Product
   onCartAdd?: () => void;
 }
-export const ProductCard = ({ data }: ProductCardProps) => {
+export const ProductCard = ({ onCartAdd, data }: ProductCardProps) => {
   return (
     <Card className="pt-0">
       <CardContent className="bg-[#F3F5F7] relative py-6">
@@ -25,7 +25,7 @@ export const ProductCard = ({ data }: ProductCardProps) => {
         </div>
         <Image src={data.thumbnail} width={800} height={600} alt="Product Image" />
         <div className="absolute flex items-center justify-center left-0 bottom-6 w-full px-6">
-          <AddToCart productID={data.id}>Add to cart</AddToCart>
+          <AddToCart onCartAdd={onCartAdd} productID={data.id}>Add to cart</AddToCart>
         </div>
       </CardContent>
       <CardFooter className="flex flex-col items-start">

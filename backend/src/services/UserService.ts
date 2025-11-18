@@ -1,16 +1,20 @@
-
-import { PgRelationalQuery } from "drizzle-orm/pg-core/query-builders/query";
 import { db } from "../config/db/db";
 import { users } from "../config/db/schema";
 import { userValidatorPartial, type userValidator } from "../validators/User";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 
-export const findUser = (id: Number) => {
+export const findUser = (id: number) => {
   return db.query.users.findFirst({
     where: (users, { eq }) => eq(users.id, Number(id)),
+    columns: {
+      password: false,
+      createdAt: false,
+      updatedAt: false
+    }
   });
 }
+
 
 export const findUserByEmail = (email: string) => {
   return db.query.users.findFirst({

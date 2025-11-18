@@ -24,7 +24,6 @@ export const useLocalStorage = () => {
     }
   }
 
-
   const deleteItem = (key: string) => {
     try {
       window.localStorage.removeItem(key);

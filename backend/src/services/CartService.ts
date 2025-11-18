@@ -56,7 +56,9 @@ export const getCarts = async (userId: number) => {
       productData: el
     }
   });
-
   return res;
+}
 
+export const getCartCount = (userId: number) => {
+  return db.$count(carts, eq(carts.userId, userId));
 }

@@ -36,7 +36,6 @@ export const login: RequestHandler = async (req, res, next) => {
                 "The credentials provided does not match any in our system"
               ]
             }
-
           }
         }
       });

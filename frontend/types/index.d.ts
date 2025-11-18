@@ -1,3 +1,4 @@
+import { LoginValidator } from "@/lib/validations/authValidators"
 import { ZodFormattedError } from "zod/v3"
 
 export type ApiValidatorError<T> = {
@@ -70,4 +71,11 @@ export interface Meta {
   updatedAt: string
   barcode: string
   qrCode: string
+}
+
+export interface User {
+  firstName: string,
+  lastName: string,
+  email: string,
+  id: number,
 }

@@ -72,7 +72,7 @@ export default function ShopPage() {
                 height: `${item.size}px`,
                 transform: `translateY(${item.start}px)`
               }}>
-              <ProductCard data={products[item.index]} />
+              <ProductCard data={products[item.index]} onCartAdd={() => setTimeout(() => toast.success("Cart successfully added"))} />
             </div>
           )
         })}

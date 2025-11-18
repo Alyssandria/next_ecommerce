@@ -11,6 +11,12 @@ export interface credentials extends JwtPayload {
   email: string,
   id: number
 }
+export interface UserPayload {
+  id: number,
+  email: string,
+  lastName: string,
+  firstName: string
+}
 export interface AuthenticatedRequest extends Request {
-  user?: typeof users.$inferSelect
+  user?: UserPayload
 }

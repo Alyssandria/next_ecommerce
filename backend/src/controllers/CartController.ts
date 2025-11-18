@@ -8,18 +8,19 @@ import { AuthenticatedRequest, routeParam } from "../types/types";
 
 
 export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
-
   if (!req.user) {
     return res.sendStatus(403);
   }
 
   try {
     const cartItems = await getCarts(req.user.id);
+
     return res.json({
       success: true,
       data: cartItems
     })
   } catch (error) {
+    console.log(error);
     next();
   }
 }
@@ -143,5 +144,4 @@ export const deleteCartRoute: RequestHandler = async (req, res, next) => {
     console.log(error);
     next();
   }
-
 }

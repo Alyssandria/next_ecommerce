@@ -4,6 +4,6 @@ import { auth } from "../middleware/auth";
 
 export const userRouter = Router();
 
-userRouter.get('/:id', auth, getUser);
+userRouter.get('/', auth, getUser);
 userRouter.patch('/:id', auth, patchUser);
 userRouter.delete('/:id', auth, deleteUserRoute);

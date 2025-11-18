@@ -11,23 +11,26 @@ export function cn(...inputs: ClassValue[]) {
 export function fetchApi(route: string, opts?: RequestInit) {
   if (route.startsWith('/')) route = route.slice(1);
   return fetch(`${process.env.NEXT_PUBLIC_API_BASE}${route}`, {
+    ...opts,
     headers: {
       ...opts?.headers,
       "Content-Type": "application/json",
     },
     credentials: 'include',
-    ...opts
   });
 }
 export async function fetchWithAuth(route: string, opts?: RequestInit) {
   const { getItem } = useLocalStorage();
   const token = getItem("token");
+
+  if (token) {
+    return Promise.reject("Unauthorized");
+  }
   const res = await fetchApi(route, {
     ...opts,
     headers: {
       ...opts?.headers,
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "",
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -42,8 +45,7 @@ export async function fetchWithAuth(route: string, opts?: RequestInit) {
       ...opts,
       headers: {
         ...opts?.headers,
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${refresh}` : "",
+        Authorization: `Bearer ${refresh}`,
       },
     });
   }

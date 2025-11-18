@@ -1,33 +1,25 @@
 import { RequestHandler } from "express";
-import { deleteUser, findUser, updateUser } from "../services/UserService";
+import { deleteUser, updateUser } from "../services/UserService";
 import { validatorError } from "../services/ErrorService";
 import { userValidatorSchemaPartial } from "../validators/User";
-import { routeParam } from "../types/types";
+import { AuthenticatedRequest, routeParam } from "../types/types";
+import { getCartCount } from "../services/CartService";
 
-export const getUser: RequestHandler = async (req, res, next) => {
-  const validatedParams = routeParam.safeParse(req.params);
-
-  if (!validatedParams.success) {
-    return validatorError(res, validatedParams.error);
+export const getUser: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+  if (!req.user) {
+    return res.sendStatus(401);
   }
 
-  const { id } = validatedParams.data
-
   try {
-    const user = await findUser(id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        errors: {
-          id: "Cannot find user that matches the credentials"
-        },
-      });
-    }
-
+    const cartCount = await getCartCount(req.user.id);
     return res.json({
       success: true,
-      data: user
+      data: {
+        user: req.user,
+        cartCount
+      }
     });
+
   } catch (error) {
     next();
   }

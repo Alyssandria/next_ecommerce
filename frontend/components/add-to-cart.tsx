@@ -1,7 +1,8 @@
 "use client";
 import { ComponentProps } from "react";
 import { Button } from "./ui/button"
-import { fetchApi, fetchWithAuth, refreshToken } from "@/lib/utils";
+import { fetchWithAuth } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface AddToCartProps extends ComponentProps<typeof Button> {
   productID: number,
@@ -21,6 +22,12 @@ export const AddToCart = ({ productID, children, onCartAdd }: AddToCartProps) =>
           })
         });
 
+        if (!res.ok) {
+          setTimeout(() => toast.error("Something went wrong, please try again later"));
+          return;
+        }
+
+        onCartAdd?.();
       }}
     >{children} </Button>
   )
