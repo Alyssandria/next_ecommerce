@@ -7,6 +7,25 @@ import z from "zod";
 import { AuthenticatedRequest, getPaginationQuery, routeParam } from "../types/types";
 
 
+export const getCartCountRoute: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+  if (!req.user) {
+    return res.sendStatus(403);
+  }
+
+  try {
+    return res.json({
+      success: true,
+      data: {
+        cartCount: await getCartCount(req.user.id)
+      }
+    })
+
+  } catch (error) {
+    console.error(error);
+    next();
+  }
+}
+
 export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {
     return res.sendStatus(403);
