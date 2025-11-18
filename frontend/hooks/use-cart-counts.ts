@@ -1,22 +1,20 @@
+"use client";
 import { fetchWithAuth } from "@/lib/utils";
-import { CartItem } from "@/types";
 import { useQuery } from "@tanstack/react-query"
 
-export const useCarts = () => {
+export const useCartCount = () => {
   return useQuery({
-    queryKey: ['get_carts'],
+    queryKey: ['cart_count'],
+    refetchInterval: () => false,
     queryFn: async () => {
-      const res = await fetchWithAuth('/carts');
+      const res = await fetchWithAuth('/carts/count');
 
       if (!res.ok) {
         throw new Error("Unable to fetch cart counts");
       }
 
       return (await res.json()).data as {
-        total: number,
-        skip: number,
-        limit: number,
-        carts: CartItem[]
+        cartCount: number
       }
     }
   })

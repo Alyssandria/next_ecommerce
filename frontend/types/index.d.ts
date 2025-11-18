@@ -79,3 +79,7 @@ export interface User {
   email: string,
   id: number,
 }
+export interface CartItem {
+  quantity: number,
+  productData: Product
+}

@@ -20,10 +20,12 @@ export function fetchApi(route: string, opts?: RequestInit) {
   });
 }
 export async function fetchWithAuth(route: string, opts?: RequestInit) {
+  "use client"
   const { getItem } = useLocalStorage();
   const token = getItem("token");
+  console.log(token);
 
-  if (token) {
+  if (!token) {
     return logout();
   }
   const res = await fetchApi(route, {
