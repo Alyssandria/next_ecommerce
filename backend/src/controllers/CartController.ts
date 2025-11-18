@@ -1,10 +1,10 @@
 import { RequestHandler } from "express";
 import { cartValidatorSchema, cartValidatorSchemaPartial } from "../validators/Cart";
 import { validatorError } from "../services/ErrorService";
-import { createCart, deleteCart, getCarts, updateCart } from "../services/CartService";
+import { createCart, deleteCart, getCartCount, getCarts, updateCart } from "../services/CartService";
 import { DrizzleQueryError } from "drizzle-orm";
 import z from "zod";
-import { AuthenticatedRequest, routeParam } from "../types/types";
+import { AuthenticatedRequest, getPaginationQuery, routeParam } from "../types/types";
 
 
 export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
@@ -12,12 +12,26 @@ export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, ne
     return res.sendStatus(403);
   }
 
+  const validated = getPaginationQuery.safeParse(req.query);
+
+  if (!validated.success) {
+    return validatorError(res, validated.error);
+  }
+
+  const { limit, skip } = validated.data;
+
   try {
-    const cartItems = await getCarts(req.user.id);
+    const cartItems = await getCarts(req.user.id, limit, skip);
+    const total = await getCartCount(req.user.id);
 
     return res.json({
       success: true,
-      data: cartItems
+      data: {
+        carts: cartItems,
+        total,
+        skip: skip || 0,
+        limit: skip || 10,
+      }
     })
   } catch (error) {
     console.log(error);

@@ -1,6 +1,6 @@
-import { eq, inArray, sql } from "drizzle-orm";
+import { asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../config/db/db";
-import { carts } from "../config/db/schema";
+import { carts, users } from "../config/db/schema";
 import { cartValidatorPartial, type cartValidator } from "../validators/Cart";
 import { fetchProductsById } from "./ProductService";
 import { env } from "../config/env";
@@ -33,11 +33,8 @@ export const deleteCart = (ids: number[]) => {
   return db.delete(carts).where(inArray(carts.id, ids)).returning();
 }
 
-export const getCarts = async (userId: number) => {
-  const items = await db.query.carts.findMany({
-    where: ((carts, { eq }) => eq(carts.userId, userId))
-  });
-
+export const getCarts = async (userId: number, limit: number = 15, skip: number = 0) => {
+  const items = await db.select().from(carts).orderBy(desc(carts.createdAt)).where(eq(carts.userId, userId)).limit(limit).offset(skip)
   const promises = await fetchProductsById(items.map(el => el.productId))
 
   const json = await Promise.all(promises.map(async (res) => {

@@ -24,7 +24,7 @@ export async function fetchWithAuth(route: string, opts?: RequestInit) {
   const token = getItem("token");
 
   if (token) {
-    return Promise.reject("Unauthorized");
+    return logout();
   }
   const res = await fetchApi(route, {
     ...opts,
