@@ -85,6 +85,18 @@ export async function logout() {
   return redirect('/login');
 }
 
+export const formatCase = (s: string) => {
+  const split = s.split(" ");
+
+  if (split.length === 1) {
+    return `${s.charAt(0).toUpperCase()}${s.slice(1)}`
+  }
+
+  return split.map(el => (
+    `${el.charAt(0).toUpperCase()}${el.slice(1)}`
+  )).join(" ");
+}
+
 export async function refreshToken(): Promise<never | string> {
   const refresh = await fetchApi('/auth/refresh', {
     method: "POST"

@@ -16,6 +16,7 @@ export const auth: RequestHandler = async (req: AuthenticatedRequest, res, next)
   try {
     const verify = jwt.verify(token, env.JWT_SECRET) as credentials;
     const user = await findUser(verify.id);
+    console.log(verify);
 
     if (!user) {
       return res.sendStatus(403);

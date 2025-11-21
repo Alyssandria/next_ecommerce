@@ -81,5 +81,6 @@ export interface User {
 }
 export interface CartItem {
   quantity: number,
+  id: number,
   productData: Product
 }

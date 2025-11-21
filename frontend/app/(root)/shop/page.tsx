@@ -3,7 +3,6 @@
 import { ProductCard } from "@/components/product-card";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useProducts } from "@/hooks/use-products";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -61,7 +60,7 @@ export default function ShopPage() {
     >
       <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
         {virtualizer.getVirtualItems().map(item => {
-          const isLoaderRow = item.index >= products.length - 1;
+          const isLoaderRow = item.index > products.length - 1;
 
           if (isLoaderRow) return null;
 

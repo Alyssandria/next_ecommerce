@@ -1,7 +1,7 @@
-import { asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../config/db/db";
 import { carts, users } from "../config/db/schema";
-import { cartValidatorPartial, type cartValidator } from "../validators/Cart";
+import { cartValidatorPartial, updateCartValidator, type cartValidator } from "../validators/Cart";
 import { fetchProductsById } from "./ProductService";
 import { env } from "../config/env";
 
@@ -21,12 +21,14 @@ export const createCart = (data: cartValidator) => {
   })
 }
 
-export const updateCart = (id: number, data: cartValidatorPartial) => {
+export const updateCart = (id: number, userId: number, data: updateCartValidator) => {
   return db.update(carts).set({
     quantity: data.quantity,
-    userId: data.user_id,
-    productId: data.product_id
-  }).where(eq(carts.id, id));
+  }).where(
+    and(
+      eq(carts.id, id),
+      eq(carts.userId, userId)
+    )).returning();
 }
 
 export const deleteCart = (ids: number[]) => {
@@ -38,18 +40,15 @@ export const getCarts = async (userId: number, limit: number = 15, skip: number 
   const promises = await fetchProductsById(items.map(el => el.productId))
 
   const json = await Promise.all(promises.map(async (res) => {
-    if (res.status === "fulfilled") {
-      return res.value.json();
-    }
-
-    return null;
-  })) as ({ id: number } | null)[];
+    return await res.json();
+  }))
 
   const res = json.map(el => {
-    if (!el) return el;
-    const quantity = items.find(x => el.id === x.productId)!.quantity;
+    const cartItem = items.find(x => el.id === x.productId);
+    if (!cartItem) return null;
     return {
-      quantity,
+      id: cartItem.id,
+      quantity: cartItem.quantity,
       productData: el
     }
   });

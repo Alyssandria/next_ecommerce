@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
-import { cartValidatorSchema, cartValidatorSchemaPartial } from "../validators/Cart";
+import { cartValidatorSchema, cartValidatorSchemaPartial, updateCartValidatorSchema } from "../validators/Cart";
 import { validatorError } from "../services/ErrorService";
 import { createCart, deleteCart, getCartCount, getCarts, updateCart } from "../services/CartService";
 import { DrizzleQueryError } from "drizzle-orm";
-import z from "zod";
+import z, { success } from "zod";
 import { AuthenticatedRequest, getPaginationQuery, routeParam } from "../types/types";
 
 
@@ -48,8 +48,8 @@ export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, ne
       data: {
         carts: cartItems,
         total,
-        skip: skip || 0,
-        limit: skip || 10,
+        skip: skip ?? 0,
+        limit: limit ?? 10,
       }
     })
   } catch (error) {
@@ -100,9 +100,13 @@ export const postCart: RequestHandler = async (req: AuthenticatedRequest, res, n
   }
 }
 
-export const patchCart: RequestHandler = async (req, res, next) => {
+export const patchCart: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   // VALIDATE PATCHBODY
-  const validatedBody = cartValidatorSchemaPartial.safeParse(req.body);
+  if (!req.user) {
+    return res.sendStatus(401);
+  }
+
+  const validatedBody = updateCartValidatorSchema.safeParse(req.body);
 
   const validatedParams = routeParam.safeParse(req.params);
 
@@ -116,14 +120,30 @@ export const patchCart: RequestHandler = async (req, res, next) => {
     return validatorError(res, validatedBody.error);
   }
 
-  const { product_id, quantity, user_id } = validatedBody.data;
+  const { quantity } = validatedBody.data;
 
   try {
-    await updateCart(Number(id), {
+    const updated = await updateCart(Number(id), req.user.id, {
       quantity,
-      product_id,
-      user_id
     });
+    console.log(updated);
+
+    if (updated.length < 1) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          global: false,
+          form: {
+            fieldErrors: {
+              id: [
+                "Invalid Request. User have no cart item with the corresponding id"
+              ]
+            }
+          }
+        }
+
+      })
+    }
 
     return res.json({
       success: true,
@@ -131,6 +151,7 @@ export const patchCart: RequestHandler = async (req, res, next) => {
         id,
       }
     })
+
   } catch (error) {
     console.log(error);
     next();
