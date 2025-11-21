@@ -3,9 +3,10 @@ import { CartItem } from "@/types";
 import { useInfiniteQuery } from "@tanstack/react-query"
 
 const LIMIT = 10;
-export const useCarts = () => {
+export const useCarts = (enabled: boolean = true) => {
   return useInfiniteQuery({
     queryKey: ['carts'],
+    enabled,
     queryFn: async ({ pageParam }) => {
       const res = await fetchWithAuth(`/carts?limit=${LIMIT}&skip=${pageParam}`, {
         cache: 'no-store'

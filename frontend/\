@@ -3,7 +3,6 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -14,12 +13,9 @@ import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useCarts } from "@/hooks/use-carts";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { CartProduct } from "./cart-products";
-import { formatPrice } from "@/lib/utils";
-import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
 
 const CartItems = () => {
   const { data, error, isFetchingNextPage, fetchNextPage, hasNextPage, isPending } = useCarts();
@@ -78,7 +74,7 @@ const CartItems = () => {
   return (
     <div
       ref={scrollableRef}
-      className="h-[60vh] overflow-auto w-full"
+      className="h-[80vh] overflow-auto w-full"
     >
       <div className="relative overflow-hidden w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
         {virtualizer.getVirtualItems().map(item => {
@@ -106,21 +102,8 @@ const CartItems = () => {
   )
 }
 export const CartSidebar = () => {
-  const [total, setTotal] = useState(0);
   const cartCount = useCartCount();
-  const { data, isFetching } = useCarts(false);
-  const carts = data ? data.pages.flatMap(page => page.carts) : [];
-
-
-  useEffect(() => {
-    let total = 0;
-
-    carts.forEach(el => {
-      total += (el.quantity * el.productData.price);
-    });
-
-    setTotal(total);
-  }, [carts]);
+  const { } = useCarts();
 
   if (cartCount.isError) {
     return <Link className="block ml-auto" href={'/login'}>Login</Link>
@@ -144,18 +127,6 @@ export const CartSidebar = () => {
           </SheetDescription>
         </SheetHeader>
         <CartItems />
-        <SheetFooter className="gap-6">
-          <div className="px-4 w-full items-center flex justify-between text-neutral-07">
-            <span className="text-xl font-medium">Total</span>
-            <span>{isFetching ?
-              <Skeleton className="w-20 h-6" />
-              : formatPrice(total)}</span>
-          </div>
-          <Button className="w-full p-8">
-            Checkout
-          </Button>
-          <Link href={'carts'} className="w-full text-center underline">View Cart</Link>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   )
