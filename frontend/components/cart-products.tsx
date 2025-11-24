@@ -2,14 +2,14 @@
 import { formatCase, formatPrice } from "@/lib/utils";
 import { CartItem } from "@/types";
 import Image from "next/image";
-import { ComponentProps, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { useUpdateQuantity } from "@/hooks/use-update-quantity";
 import { Loader2Icon, XIcon } from "lucide-react";
 import { useDeleteCart } from "@/hooks/use-delete-cart";
 import { toast } from "sonner";
 
-export const CartProduct = ({ data }: { data: CartItem } & ComponentProps<"div">) => {
+export const CartProduct = ({ data, isSelected }: { data: CartItem, isSelected: boolean }) => {
   const [quantity, setQuantity] = useState(data.quantity);
   const updateQuantity = useUpdateQuantity();
   const deleteCart = useDeleteCart();
@@ -33,7 +33,7 @@ export const CartProduct = ({ data }: { data: CartItem } & ComponentProps<"div">
   return (
     <div className="w-full flex gap-2">
       <div className="flex bg-[#F3F5F7] items-center justify-center">
-        <Image src={productData.thumbnail} alt="Product Image" width={860} height={320} className="max-w-20 object-center" />
+        <Image src={productData.thumbnail} alt="Product Image" width={860} height={320} className="max-w-14 sm:max-w-20 object-center" />
       </div>
       <div className="flex flex-col gap-4 justify-between w-full">
         <div className="flex flex-wrap gap-2 justify-between w-full">
@@ -42,22 +42,25 @@ export const CartProduct = ({ data }: { data: CartItem } & ComponentProps<"div">
         </div>
         <div className="flex justify-between items-center">
           <span className="block text-xs text-neutral-04 truncate">{formatCase(productData.category)}</span>
-          <Button variant={"ghost"}
-            onClick={() => {
-              deleteCart.mutate({
-                ids: [data.id]
-              });
-            }}
-          >
-            {deleteCart.isPending ?
-              <Loader2Icon className="animate-spin" /> :
-              <XIcon />
-            }
+          {!isSelected &&
+            <Button variant={"ghost"}
+              size={"icon-sm"}
+              onClick={() => {
+                deleteCart.mutate({
+                  ids: [data.id]
+                });
+              }}
+            >
+              {deleteCart.isPending ?
+                <Loader2Icon className="animate-spin" /> :
+                <XIcon />
+              }
 
-          </Button>
+            </Button>
+          }
         </div>
-        <div>
-          <div className="flex gap-2 items-center border border-neutral-04 w-fit rounded-md px-2">
+        <div className="flex">
+          <div className="flex justify-around items-center border border-neutral-04 w-full rounded-md px-2">
             <Button onClick={() => {
               handleQuantityButton(-1);
             }}
