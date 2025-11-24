@@ -31,7 +31,7 @@ const CartItems = () => {
     {
       count: hasNextPage ? carts.length + 1 : carts.length,
       getScrollElement: () => scrollableRef.current,
-      estimateSize: () => 150,
+      estimateSize: () => 160,
       overscan: 5
     });
 
@@ -81,7 +81,7 @@ const CartItems = () => {
       className="h-[60vh] overflow-auto w-full"
     >
       <div className="relative overflow-hidden w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
-        {virtualizer.getVirtualItems().map(item => {
+        {virtualItems.map(item => {
           const isLoaderRow = item.index > carts.length - 1;
           const cart = carts[item.index];
 
@@ -91,7 +91,7 @@ const CartItems = () => {
           return (
             <>
               <div key={item.key}
-                className="absolute border-b top-0 left-0 w-full"
+                className="absolute top-0 left-0 w-full"
                 style={{
                   height: `${item.size}px`,
                   transform: `translateY(${item.start}px)`

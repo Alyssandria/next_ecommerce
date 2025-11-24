@@ -2,13 +2,17 @@
 import { formatCase, formatPrice } from "@/lib/utils";
 import { CartItem } from "@/types";
 import Image from "next/image";
-import { ComponentProps, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { useUpdateQuantity } from "@/hooks/use-update-quantity";
+import { Loader2Icon, XIcon } from "lucide-react";
+import { useDeleteCart } from "@/hooks/use-delete-cart";
+import { toast } from "sonner";
 
 export const CartProduct = ({ data }: { data: CartItem } & ComponentProps<"div">) => {
   const [quantity, setQuantity] = useState(data.quantity);
   const updateQuantity = useUpdateQuantity();
+  const deleteCart = useDeleteCart();
 
 
   const handleQuantityButton = (op: number) => {
@@ -16,11 +20,18 @@ export const CartProduct = ({ data }: { data: CartItem } & ComponentProps<"div">
     updateQuantity.mutate({ id: data.id, quantity: Math.max(1, quantity + op) });
   }
 
+  useEffect(() => {
+    if (deleteCart.isSuccess) {
+      setTimeout(() => toast.success("Cart item deleted!"))
+    }
+
+  }, [deleteCart.isSuccess])
+
 
   const productData = data.productData;
 
   return (
-    <div className="w-full flex gap-2 px-4">
+    <div className="w-full flex gap-2">
       <div className="flex bg-[#F3F5F7] items-center justify-center">
         <Image src={productData.thumbnail} alt="Product Image" width={860} height={320} className="max-w-20 object-center" />
       </div>
@@ -29,8 +40,21 @@ export const CartProduct = ({ data }: { data: CartItem } & ComponentProps<"div">
           <span className="block max-md:text-xs max-w-32 truncate w-full">{productData.title}</span>
           <span className="block font-medium max-md:text-xs">{formatPrice(productData.price)}</span>
         </div>
-        <div>
+        <div className="flex justify-between items-center">
           <span className="block text-xs text-neutral-04 truncate">{formatCase(productData.category)}</span>
+          <Button variant={"ghost"}
+            onClick={() => {
+              deleteCart.mutate({
+                ids: [data.id]
+              });
+            }}
+          >
+            {deleteCart.isPending ?
+              <Loader2Icon className="animate-spin" /> :
+              <XIcon />
+            }
+
+          </Button>
         </div>
         <div>
           <div className="flex gap-2 items-center border border-neutral-04 w-fit rounded-md px-2">

@@ -167,8 +167,11 @@ const deleteParams = z.object({
   }, z.array(z.coerce.number())),
 });
 
-export const deleteCartRoute: RequestHandler = async (req, res, next) => {
+export const deleteCartRoute: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   // VALIDATE PARAMS
+  if (!req.user) {
+    return res.sendStatus(401);
+  }
   const validate = deleteParams.safeParse(req.query);
 
   if (!validate.success) {
@@ -177,7 +180,7 @@ export const deleteCartRoute: RequestHandler = async (req, res, next) => {
   const { ids } = validate.data
 
   try {
-    const deleted = await deleteCart(ids);
+    const deleted = await deleteCart(req.user.id, ids);
 
     if (deleted.length === 0) {
       return res.json({
@@ -188,12 +191,10 @@ export const deleteCartRoute: RequestHandler = async (req, res, next) => {
       })
     }
 
-    if (!deleted.length)
-      return res.json({
-        success: true,
-        data: ids
-      });
-
+    return res.json({
+      success: true,
+      data: ids
+    });
   } catch (error) {
     console.log(error);
     next();

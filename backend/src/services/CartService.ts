@@ -31,8 +31,13 @@ export const updateCart = (id: number, userId: number, data: updateCartValidator
     )).returning();
 }
 
-export const deleteCart = (ids: number[]) => {
-  return db.delete(carts).where(inArray(carts.id, ids)).returning();
+export const deleteCart = (userId: number, ids: number[]) => {
+  return db.delete(carts).where(
+    and(
+      inArray(carts.id, ids),
+      eq(carts.userId, userId)
+    )
+  ).returning();
 }
 
 export const getCarts = async (userId: number, limit: number = 15, skip: number = 0) => {
