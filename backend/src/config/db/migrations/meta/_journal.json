@@ -15,6 +15,48 @@
       "when": 1763119820975,
       "tag": "0001_omniscient_mister_fear",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764047816786,
+      "tag": "0002_slow_nightmare",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1764051417471,
+      "tag": "0003_wide_unus",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1764052514606,
+      "tag": "0004_first_ser_duncan",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1764053163847,
+      "tag": "0005_breezy_lifeguard",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1764054789129,
+      "tag": "0006_clammy_whizzer",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1764054986035,
+      "tag": "0007_brown_harpoon",
+      "breakpoints": true
     }
   ]
 }

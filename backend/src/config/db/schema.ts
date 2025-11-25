@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, serial, timestamp, unique, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { integer, numeric, pgTable, primaryKey, real, serial, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
 
 const helper = {
@@ -19,6 +19,17 @@ export const users = pgTable(
   }
 )
 
+export const orders = pgTable(
+  'orders',
+  {
+    userId: integer('user_id').references(() => users.id),
+    orderNo: varchar('order_no', { length: 33 }).unique().notNull(),
+    total: numeric('total', { precision: 10, scale: 2, mode: "string" }).notNull(),
+    ...helper
+  }
+);
+
+
 export const carts = pgTable('cart_items', {
   userId: integer("user_id").references(() => users.id),
   productId: integer("product_id").notNull(),
@@ -28,13 +39,40 @@ export const carts = pgTable('cart_items', {
   uniqueIndex('uniqueUserCartItem').on(t.userId, t.productId)
 ]);
 
-export const cartItemRelations = relations(carts, ({ one }) => ({
+
+export const orderProducts = pgTable('order_products', {
+  price: numeric("price", { precision: 10, scale: 2, mode: "string" }).notNull(),
+  quantity: integer("quantity").notNull(),
+  orderId: integer("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  productId: integer("product_id").notNull(),
+}, (t) => [
+  primaryKey({ columns: [t.productId, t.orderId] }),
+  uniqueIndex('uniqueProductOrders').on(t.productId, t.orderId)
+]);
+
+export const orderProductRelations = relations(orderProducts, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderProducts.orderId],
+    references: [orders.id]
+  }),
+}));
+
+export const cartItemRelations = relations(carts, ({ one, many }) => ({
   user: one(users, {
     fields: [carts.userId],
     references: [users.id]
-  })
+  }),
+}));
+
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(users, {
+    fields: [orders.userId],
+    references: [users.id]
+  }),
 }));
 
 export const userRelations = relations(users, ({ many }) => ({
-  cartItems: many(carts)
+  cartItems: many(carts),
+  orders: many(orders)
 }));

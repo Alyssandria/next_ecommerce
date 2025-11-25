@@ -72,7 +72,7 @@ export const refresh: RequestHandler = async (req: AuthenticatedRequest, res) =>
   try {
     const verify = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as credentials;
 
-    const token = jwt.sign({ id: verify.id, email: verify.email }, env.JWT_SECRET);
+    const token = jwt.sign({ id: verify.id, email: verify.email }, env.JWT_SECRET, { expiresIn: "15m" });
     return res.json({ token });
   } catch (error) {
     return res.sendStatus(403);

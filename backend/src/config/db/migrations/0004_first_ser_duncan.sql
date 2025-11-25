@@ -1,0 +1,1 @@
+ALTER TABLE "order_products" ALTER COLUMN "price" SET DATA TYPE numeric(10, 2);
