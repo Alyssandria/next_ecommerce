@@ -7,6 +7,7 @@ import cors from "cors";
 import { env } from "./config/env";
 import { productRouter } from "./routes/products.routes";
 import { orderRouter } from "./routes/order.routes";
+import { paymentRouter } from "./routes/payment.routes";
 
 export const app = express();
 
@@ -22,3 +23,4 @@ app.use('/api/v1/carts', cartRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/orders', orderRouter);
+app.use('/api/v1/payments', paymentRouter);

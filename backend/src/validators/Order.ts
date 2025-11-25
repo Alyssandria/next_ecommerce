@@ -8,6 +8,10 @@ export const orderValidatorSchema = z.object({
     price: z.number().transform((val) => String(val)),
     quantity: z.number()
   }))
-})
+});
 
 export type OrderValidator = z.infer<typeof orderValidatorSchema>;
+
+export const orderPaymentSchema = orderValidatorSchema.omit({ order_no: true });
+
+export type orderPaymentValidator = z.infer<typeof orderPaymentSchema>
