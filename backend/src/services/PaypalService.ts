@@ -19,7 +19,7 @@ const client = new Client({
 const ordersController = new OrdersController(client);
 const paymentsController = new PaymentsController(client);
 
-export const createPaypalOrder = async (data: orderPaymentValidator) => {
+export const createOrderPayment = async (data: orderPaymentValidator) => {
   const collect: {
     body: OrderRequest
   } = {
@@ -60,3 +60,17 @@ export const createPaypalOrder = async (data: orderPaymentValidator) => {
     status: httpResponse.statusCode
   } as { body: Order, status: number };
 }
+
+export const captureOrderPayment = async (token: string) => {
+  const collect = {
+    id: token
+  }
+
+  const { body, ...httpResponse } = await ordersController.captureOrder(collect);
+
+  return {
+    body: JSON.parse(body as string),
+    status: httpResponse.statusCode
+  }
+}
+
