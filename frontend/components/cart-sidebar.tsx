@@ -23,6 +23,8 @@ import { Skeleton } from "./ui/skeleton";
 import { Checkbox } from "./ui/checkbox";
 import { CartItem } from "@/types";
 import { useDeleteCart } from "@/hooks/use-delete-cart";
+import { PaypalButton } from "./paypal-button";
+import { number, object } from "zod";
 
 const CartItems = ({ selected, setSelected }: {
   selected: number[],
@@ -199,6 +201,7 @@ export const CartSidebar = () => {
   if (cartCount.isPending) {
     return <Loader2Icon className="ml-auto w-6 animate-spin" />
   }
+  console.log();
 
   return (
     <Sheet>
@@ -224,6 +227,14 @@ export const CartSidebar = () => {
           <Button disabled={selected.length === 0} className=" w-full p-8">
             Checkout
           </Button>
+          <PaypalButton data={{
+            total,
+            products: selected.map(el => ({
+              product_id: carts[el].productData.id,
+              quantity: carts[el].quantity,
+              price: carts[el].productData.price,
+            }))
+          }} />
           <Link href={'carts'} className="w-full text-center underline">View Cart</Link>
         </SheetFooter>
       </SheetContent>

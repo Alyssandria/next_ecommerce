@@ -16,6 +16,8 @@ export const handleOrderCreate: RequestHandler = async (req: AuthenticatedReques
     return validatorError(res, validated.error);
   }
 
+  console.log(validated.data);
+
   try {
     return res.json({
       success: true,

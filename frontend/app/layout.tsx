@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/providers/query-provider";
+import { PaymentProvider } from "@/providers/payment-provider";
 
 const poppins = Poppins({
   weight: ['300', "500", "700"],
@@ -25,7 +26,9 @@ export default function RootLayout({
         className={`${poppins.className} antialiased`}
       >
         <QueryProvider>
-          {children}
+          <PaymentProvider>
+            {children}
+          </PaymentProvider>
         </QueryProvider>
         <Toaster position="top-center" richColors />
       </body>
