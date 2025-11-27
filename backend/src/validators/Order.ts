@@ -1,9 +1,10 @@
 import z from "zod";
 
 export const orderValidatorSchema = z.object({
-  order_no: z.string().min(2),
+  order_no: z.string().min(17),
   total: z.number().refine(val => !isNaN(Number(val))).transform((val) => val.toString()),
   products: z.array(z.object({
+    name: z.string().min(2),
     product_id: z.number(),
     price: z.number().transform((val) => String(val)),
     quantity: z.number()

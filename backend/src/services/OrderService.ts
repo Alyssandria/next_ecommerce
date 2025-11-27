@@ -12,6 +12,7 @@ export const createOrder = async (userId: number, data: OrderValidator) => {
 
     const products = await Promise.all(data.products.map(async product => {
       const [row] = await tx.insert(orderProducts).values({
+        name: product.name,
         price: product.price,
         orderId: order.id,
         quantity: product.quantity,

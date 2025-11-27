@@ -24,7 +24,6 @@ import { Checkbox } from "./ui/checkbox";
 import { CartItem } from "@/types";
 import { useDeleteCart } from "@/hooks/use-delete-cart";
 import { PaypalButton } from "./paypal-button";
-import { number, object } from "zod";
 
 const CartItems = ({ selected, setSelected }: {
   selected: number[],
@@ -183,15 +182,15 @@ export const CartSidebar = () => {
     return acc;
   }, {} as Record<number, CartItem>) : [];
 
-  console.log(selected);
   useEffect(() => {
     let total = 0;
 
     selected.forEach(el => {
-      total += (carts[el].quantity * carts[el].productData.price);
+      total = Number((total + (carts[el].quantity * carts[el].productData.price)).toFixed(2));
     });
 
     setTotal(total);
+    console.log(total);
   }, [selected]);
 
   if (cartCount.isError) {
@@ -202,6 +201,7 @@ export const CartSidebar = () => {
     return <Loader2Icon className="ml-auto w-6 animate-spin" />
   }
   console.log();
+
 
   return (
     <Sheet>
@@ -230,9 +230,10 @@ export const CartSidebar = () => {
           <PaypalButton data={{
             total,
             products: selected.map(el => ({
+              name: carts[el].productData.title,
               product_id: carts[el].productData.id,
               quantity: carts[el].quantity,
-              price: carts[el].productData.price,
+              price: Number(carts[el].productData.price.toFixed(2)),
             }))
           }} />
           <Link href={'carts'} className="w-full text-center underline">View Cart</Link>

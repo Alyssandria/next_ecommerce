@@ -3,12 +3,26 @@ import { AuthenticatedRequest } from "../types/types";
 import { orderValidatorSchema } from "../validators/Order";
 import { validatorError } from "../services/ErrorService";
 import { createOrder } from "../services/OrderService";
-import { success } from "zod";
 import { DrizzleQueryError } from "drizzle-orm";
+import { getOrderDetails } from "../services/PaypalService";
 
-export const getOrders: RequestHandler = (req: AuthenticatedRequest, res, next) => {
+export const getOrders: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {
     return res.sendStatus(401);
+  }
+
+  try {
+
+    const { result, status } = await getOrderDetails("78V627525X187292G");
+
+    return res.json({
+      result,
+      status
+    });
+  } catch (error) {
+    console.log(error);
+    next();
+
   }
 }
 

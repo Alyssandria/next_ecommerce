@@ -23,7 +23,7 @@ export const orders = pgTable(
   'orders',
   {
     userId: integer('user_id').references(() => users.id),
-    orderNo: varchar('order_no', { length: 33 }).unique().notNull(),
+    orderNo: varchar('order_no', { length: 18 }).unique().notNull(),
     total: numeric('total', { precision: 10, scale: 2, mode: "string" }).notNull(),
     ...helper
   }
@@ -43,6 +43,7 @@ export const carts = pgTable('cart_items', {
 export const orderProducts = pgTable('order_products', {
   price: numeric("price", { precision: 10, scale: 2, mode: "string" }).notNull(),
   quantity: integer("quantity").notNull(),
+  name: varchar('name', { length: 256 }).notNull(),
   orderId: integer("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
   productId: integer("product_id").notNull(),
 }, (t) => [

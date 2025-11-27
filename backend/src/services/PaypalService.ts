@@ -1,4 +1,4 @@
-import { ApiResponse, CheckoutPaymentIntent, Client, Environment, LogLevel, Order, OrderRequest, OrdersController, PaymentsController } from "@paypal/paypal-server-sdk";
+import { ApiResponse, CheckoutPaymentIntent, Client, Environment, LogLevel, OrderRequest, OrdersController, PaymentsController } from "@paypal/paypal-server-sdk";
 import { env } from "../config/env";
 import { orderPaymentValidator } from "../validators/Order";
 
@@ -37,28 +37,27 @@ export const createOrderPayment = async (data: orderPaymentValidator) => {
               },
             },
           },
-
           items:
             data.products.map(el => ({
-              name: "T-Shirt",
+              name: el.name,
+              sku: String(el.product_id),
               unitAmount: {
                 currencyCode: "PHP",
                 value: el.price,
               },
               quantity: String(el.quantity),
-              description: "Super Fresh Shirt",
             })),
         },
       ],
     },
   };
 
-  const { body, ...httpResponse } = await ordersController.createOrder(collect);
+  const { result, ...httpResponse } = await ordersController.createOrder(collect);
 
   return {
-    body: JSON.parse(body as string),
+    result,
     status: httpResponse.statusCode
-  } as { body: Order, status: number };
+  };
 }
 
 export const captureOrderPayment = async (token: string) => {
@@ -66,10 +65,19 @@ export const captureOrderPayment = async (token: string) => {
     id: token
   }
 
-  const { body, ...httpResponse } = await ordersController.captureOrder(collect);
+  const { result, ...httpResponse } = await ordersController.captureOrder(collect);
 
   return {
-    body: JSON.parse(body as string),
+    result,
+    status: httpResponse.statusCode
+  }
+}
+
+export const getOrderDetails = async (id: string) => {
+  const { result, ...httpResponse } = await ordersController.getOrder({ id });
+
+  return {
+    result,
     status: httpResponse.statusCode
   }
 }

@@ -32,12 +32,12 @@ export const PaypalButton = ({ data }: PaypalButtonProps) => {
         }
 
         const orderData = (await response.json()).data as {
-          body: {
+          result: {
             id: string,
           }
         };
 
-        return orderData.body.id;
+        return orderData.result.id;
       }}
       onApprove={async (data, actions) => {
         try {

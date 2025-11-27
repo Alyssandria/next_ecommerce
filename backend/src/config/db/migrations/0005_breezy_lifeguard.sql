@@ -1,1 +1,0 @@
-ALTER TABLE "orders" ALTER COLUMN "total" SET DATA TYPE numeric(10, 2);
