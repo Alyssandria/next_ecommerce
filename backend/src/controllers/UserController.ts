@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { deleteUser, updateUser } from "../services/UserService";
 import { validatorError } from "../services/ErrorService";
 import { userValidatorSchemaPartial } from "../validators/User";
-import { AuthenticatedRequest, routeParam } from "../types/types";
+import { AuthenticatedRequest, routeParamId } from "../types/types";
 import { getCartCount } from "../services/CartService";
 
 export const getUser: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
@@ -27,7 +27,7 @@ export const getUser: RequestHandler = async (req: AuthenticatedRequest, res, ne
 
 export const patchUser: RequestHandler = async (req, res, next) => {
   // VALIDATION
-  const validatedParams = routeParam.safeParse(req.params);
+  const validatedParams = routeParamId.safeParse(req.params);
 
   if (!validatedParams.success) {
     return validatorError(res, validatedParams.error);
@@ -66,7 +66,7 @@ export const patchUser: RequestHandler = async (req, res, next) => {
 
 export const deleteUserRoute: RequestHandler = async (req, res, next) => {
   // VALIDATE PARAMS
-  const validatedParams = routeParam.safeParse(req.params);
+  const validatedParams = routeParamId.safeParse(req.params);
 
   if (!validatedParams.success) {
     return validatorError(res, validatedParams.error);

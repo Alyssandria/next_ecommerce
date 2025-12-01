@@ -19,10 +19,24 @@ export const users = pgTable(
   }
 )
 
+export const shippings = pgTable(
+  'shipping_details',
+  {
+    label: varchar("label", { length: 256 }).notNull(),
+    recipient: varchar("recipient", { length: 256 }).notNull(),
+    street: varchar("street", { length: 256 }).notNull(),
+    province: varchar("province", { length: 256 }).notNull(),
+    zip: varchar("zip", { length: 4 }).notNull(),
+    userId: integer('user_id').references(() => users.id),
+    ...helper
+  }
+)
+
 export const orders = pgTable(
   'orders',
   {
     userId: integer('user_id').references(() => users.id),
+    shippingId: integer('shipping_id').references(() => shippings.id),
     orderNo: varchar('order_no', { length: 18 }).unique().notNull(),
     total: numeric('total', { precision: 10, scale: 2, mode: "string" }).notNull(),
     ...helper
@@ -71,9 +85,14 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
     fields: [orders.userId],
     references: [users.id]
   }),
+  shippings: one(shippings, {
+    fields: [orders.userId],
+    references: [shippings.id]
+  }),
 }));
 
 export const userRelations = relations(users, ({ many }) => ({
   cartItems: many(carts),
-  orders: many(orders)
+  orders: many(orders),
+  shippings: many(shippings)
 }));

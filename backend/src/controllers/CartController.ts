@@ -4,7 +4,7 @@ import { validatorError } from "../services/ErrorService";
 import { createCart, deleteCart, getCartCount, getCarts, updateCart } from "../services/CartService";
 import { DrizzleQueryError } from "drizzle-orm";
 import z, { success } from "zod";
-import { AuthenticatedRequest, getPaginationQuery, routeParam } from "../types/types";
+import { AuthenticatedRequest, getPaginationQuery, routeParamId } from "../types/types";
 
 
 export const getCartCountRoute: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
@@ -114,7 +114,7 @@ export const patchCart: RequestHandler = async (req: AuthenticatedRequest, res, 
 
   const validatedBody = updateCartValidatorSchema.safeParse(req.body);
 
-  const validatedParams = routeParam.safeParse(req.params);
+  const validatedParams = routeParamId.safeParse(req.params);
 
   if (!validatedParams.success) {
     return validatorError(res, validatedParams.error);

@@ -22,7 +22,7 @@ export const getPaginationQuery = z.object({
     })
     .optional(),
 });
-export const routeParam = z.object({
+export const routeParamId = z.object({
   id: z.string().regex(/^\d+$/, "Invalid Type. Must be a valid user id").transform(val => Number(val))
 });
 
