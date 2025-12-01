@@ -9,7 +9,7 @@ import { Loader2Icon, XIcon } from "lucide-react";
 import { useDeleteCart } from "@/hooks/use-delete-cart";
 import { toast } from "sonner";
 
-export const CartProduct = ({ data, isSelected }: { data: CartItem, isSelected: boolean }) => {
+export const CartProduct = ({ data, isSelected }: { data: CartItem, isSelected?: boolean }) => {
   const [quantity, setQuantity] = useState(data.quantity);
   const updateQuantity = useUpdateQuantity();
   const deleteCart = useDeleteCart();

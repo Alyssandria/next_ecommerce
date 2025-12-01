@@ -13,7 +13,7 @@ export const getOrders: RequestHandler = async (req: AuthenticatedRequest, res, 
 
   try {
 
-    const { result, status } = await getOrderDetails("78V627525X187292G");
+    const { result, status } = await getOrderDetails("55X8298134039594B");
 
     return res.json({
       result,

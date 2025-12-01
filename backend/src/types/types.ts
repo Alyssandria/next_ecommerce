@@ -1,9 +1,14 @@
 import { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
 import z from "zod"
-import { Money, ItemCategory, UniversalProductCode, AmountWithBreakdown, PayeeBase, PaymentInstruction, ShippingWithTrackingDetails, SupplementaryData, PaymentCollection, PaymentSourceResponse, CheckoutPaymentIntent, Payer, OrderStatus, LinkDescription } from "@paypal/paypal-server-sdk";
 
 export const getPaginationQuery = z.object({
+  ids: z.preprocess((val) => {
+    if (!Array.isArray(val)) {
+      return [val];
+    }
+    return val;
+  }, z.array(z.coerce.number())).optional(),
   limit: z.string()
     .transform(val => Number(val))
     .refine(val => !isNaN(val), {

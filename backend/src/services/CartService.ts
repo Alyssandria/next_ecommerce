@@ -4,6 +4,7 @@ import { carts, users } from "../config/db/schema";
 import { cartValidatorPartial, updateCartValidator, type cartValidator } from "../validators/Cart";
 import { fetchProductsById } from "./ProductService";
 import { env } from "../config/env";
+import { json } from "express";
 
 export const createCart = (data: cartValidator) => {
   return db.insert(carts).values({
@@ -58,6 +59,29 @@ export const getCarts = async (userId: number, limit: number = 15, skip: number 
     }
   });
   return res;
+}
+
+export const getCartItemsById = async (userId: number, ids: number[]) => {
+  const items = await db.select().from(carts).where(
+    and(
+      eq(carts.userId, userId),
+      inArray(carts.productId, ids)
+    )
+  )
+
+  const promises = await fetchProductsById(items.map(el => el.id));
+
+  const json = await Promise.all(promises.map(el => el.json()));
+
+  return json.map(el => {
+    const cartItem = items.find(x => el.id === x.productId);
+    if (!cartItem) return null;
+    return {
+      id: cartItem.id,
+      quantity: cartItem.quantity,
+      productData: el
+    }
+  });
 }
 
 export const getCartCount = (userId: number) => {

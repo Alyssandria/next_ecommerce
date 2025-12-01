@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
-import { fetchProduct, fetchProducts } from "../services/ProductService";
-import z from "zod";
+import { fetchProducts, fetchProductsById } from "../services/ProductService";
 import { validatorError } from "../services/ErrorService";
-import { getPaginationQuery, routeParam } from "../types/types";
+import { AuthenticatedRequest, getPaginationQuery } from "../types/types";
+import z from "zod";
+import { getCartItemsById } from "../services/CartService";
 
 
 export const getProducts: RequestHandler = async (req, res) => {
@@ -12,25 +13,48 @@ export const getProducts: RequestHandler = async (req, res) => {
     return validatorError(res, validated.error);
   }
 
-  const { limit, skip } = validated.data;
+  const { limit, skip, ids } = validated.data;
+
+
+  if (ids) {
+    const productsPromise = await fetchProductsById(ids);
+    return res.json({
+      success: true,
+      data: await Promise.all(productsPromise.map(async el => await el.json()))
+    })
+  }
 
   return res.json({
     success: true,
-    data: await fetchProducts(limit, skip)
+    data: ids ?
+      await fetchProductsById(ids)
+      : await fetchProducts(limit, skip)
   });
 }
 
-export const getProduct: RequestHandler = async (req, res) => {
-  const validated = routeParam.safeParse(req.params);
+export const routeParam = z.object({
+  ids: z.preprocess((val) => {
+    if (!Array.isArray(val)) {
+      return [val];
+    }
+    return val;
+  }, z.array(z.coerce.number())),
+});
+export const getProductByIds: RequestHandler = async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res.sendStatus(401)
+  }
+
+  const validated = routeParam.safeParse(req.query);
 
   if (!validated.success) {
     return validatorError(res, validated.error);
   }
 
-  const { id } = validated.data;
+  const { ids } = validated.data;
 
   return res.json({
     success: true,
-    data: await fetchProduct(id)
+    data: await getCartItemsById(req.user.id, ids)
   })
 }

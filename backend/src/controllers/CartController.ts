@@ -37,9 +37,15 @@ export const getCart: RequestHandler = async (req: AuthenticatedRequest, res, ne
     return validatorError(res, validated.error);
   }
 
-  const { limit, skip } = validated.data;
+  const { limit, skip, ids } = validated.data;
 
   try {
+    if (ids) {
+      return res.json({
+
+      });
+    }
+
     const cartItems = await getCarts(req.user.id, limit, skip);
     const total = await getCartCount(req.user.id);
 

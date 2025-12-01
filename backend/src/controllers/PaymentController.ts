@@ -11,6 +11,7 @@ export const handleOrderCreate: RequestHandler = async (req: AuthenticatedReques
     return res.sendStatus(401);
   }
 
+  console.log(req.body);
   const validated = orderPaymentSchema.safeParse(req.body);
 
   if (!validated.success) {
@@ -53,7 +54,7 @@ export const handleOrderCapture: RequestHandler = async (req: AuthenticatedReque
 
     const purchaseUnit = result.purchaseUnits![0];
 
-    console.log(purchaseUnit);
+    console.log(result.purchaseUnits);
     const items = purchaseUnit.items!;
 
     console.log(items);

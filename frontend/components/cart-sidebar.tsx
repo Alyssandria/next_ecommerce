@@ -190,7 +190,6 @@ export const CartSidebar = () => {
     });
 
     setTotal(total);
-    console.log(total);
   }, [selected]);
 
   if (cartCount.isError) {
@@ -200,7 +199,6 @@ export const CartSidebar = () => {
   if (cartCount.isPending) {
     return <Loader2Icon className="ml-auto w-6 animate-spin" />
   }
-  console.log();
 
 
   return (
@@ -224,9 +222,11 @@ export const CartSidebar = () => {
               <Skeleton className="w-20 h-6" />
               : formatPrice(total)}</span>
           </div>
-          <Button disabled={selected.length === 0} className=" w-full p-8">
+          <Link className="w-full p-8"
+            href={"/checkout?" + selected.map(el => `ids=${el}`).join("&")}
+          >
             Checkout
-          </Button>
+          </Link>
           <PaypalButton data={{
             total,
             products: selected.map(el => ({
