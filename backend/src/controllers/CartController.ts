@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
-import { cartValidatorSchema, cartValidatorSchemaPartial, updateCartValidatorSchema } from "../validators/Cart";
+import { cartValidatorSchema, updateCartValidatorSchema } from "../validators/Cart";
 import { validatorError } from "../services/ErrorService";
 import { createCart, deleteCart, getCartCount, getCarts, updateCart } from "../services/CartService";
 import { DrizzleQueryError } from "drizzle-orm";
-import z, { success } from "zod";
+import z from "zod";
 import { AuthenticatedRequest, getPaginationQuery, routeParamId } from "../types/types";
 
 

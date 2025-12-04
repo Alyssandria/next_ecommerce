@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { AuthenticatedRequest, routeParamId } from "../types/types";
 import { ShippingValidatorSchema, ShippingValidatorSchemaPartial } from "../validators/Shipping";
 import { validatorError } from "../services/ErrorService";
-import { createShipping, getUserShipping, updateShipping } from "../services/ShippingService";
+import { createShipping, deleteUserShipping, getUserShipping, updateShipping } from "../services/ShippingService";
 
 export const getShipping: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) { return res.sendStatus(401) }
@@ -17,6 +17,43 @@ export const getShipping: RequestHandler = async (req: AuthenticatedRequest, res
     console.log(error);
     next();
   }
+}
+
+export const deleteShipping: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+  if (!req.user) { return res.sendStatus(401) }
+
+  const param = routeParamId.safeParse(req.params);
+
+  if (!param.success) {
+    return validatorError(res, param.error);
+  }
+
+  const { id } = param.data;
+  try {
+    const deleted = await deleteUserShipping(req.user.id, id);
+
+    if (deleted.length === 0) {
+      return res.status(400).json({
+        false: true,
+        error: {
+          global: false,
+          error: "Shipping ID Provided not found"
+        }
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        id
+      }
+    })
+
+  } catch (error) {
+    console.log(error);
+    next();
+  }
+
 }
 export const postShipping: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {

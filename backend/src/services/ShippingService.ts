@@ -3,6 +3,15 @@ import { db } from "../config/db/db";
 import { shippings } from "../config/db/schema";
 import { ShippingValidator, ShippingValidatorPartial } from "../validators/Shipping";
 
+export const deleteUserShipping = (userId: number, id: number) => {
+  return db.delete(shippings).where(
+    and(
+      eq(shippings.id, id),
+      eq(shippings.userId, userId),
+    )
+  ).returning();
+}
+
 export const createShipping = (userId: number, data: ShippingValidator) => {
   return db.insert(shippings).values({
     userId,

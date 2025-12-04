@@ -64,29 +64,3 @@ export const patchUser: RequestHandler = async (req, res, next) => {
   }
 }
 
-export const deleteUserRoute: RequestHandler = async (req, res, next) => {
-  // VALIDATE PARAMS
-  const validatedParams = routeParamId.safeParse(req.params);
-
-  if (!validatedParams.success) {
-    return validatorError(res, validatedParams.error);
-  }
-
-  const { id } = validatedParams.data
-
-  try {
-    await deleteUser(Number(id));
-
-    return res.json({
-      success: true,
-      data: {
-        id: Number(id),
-      }
-    });
-  } catch (error) {
-    console.log(error);
-    next();
-  }
-}
-
-

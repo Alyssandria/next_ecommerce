@@ -1,10 +1,9 @@
 import { RequestHandler } from "express";
-import { AuthenticatedRequest } from "../types/types";
+import { AuthenticatedRequest, routeParamId } from "../types/types";
 import { orderValidatorSchema } from "../validators/Order";
 import { validatorError } from "../services/ErrorService";
-import { createOrder } from "../services/OrderService";
+import { createOrder, getUserOrder, getUserOrders } from "../services/OrderService";
 import { DrizzleQueryError } from "drizzle-orm";
-import { getOrderDetails } from "../services/PaypalService";
 
 export const getOrders: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {
@@ -12,17 +11,41 @@ export const getOrders: RequestHandler = async (req: AuthenticatedRequest, res, 
   }
 
   try {
-
-    const { result, status } = await getOrderDetails("55X8298134039594B");
+    const orders = await getUserOrders(req.user.id);
 
     return res.json({
-      result,
-      status
+      success: true,
+      data: orders
+    })
+  } catch (error) {
+    console.log(error);
+    next();
+  }
+}
+export const getOrder: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+  if (!req.user) {
+    return res.sendStatus(401);
+  }
+
+  const param = routeParamId.safeParse(req.params);
+
+  if (!param.success) {
+    return validatorError(res, param.error);
+  }
+
+  const { id } = param.data;
+
+  try {
+
+    const order = await getUserOrder(req.user.id, id);
+
+    return res.json({
+      success: true,
+      data: order
     });
   } catch (error) {
     console.log(error);
     next();
-
   }
 }
 
