@@ -10,9 +10,10 @@ interface PaypalButtonProps {
       price: number,
       quantity: number
     }[]
-  }
+  },
+  onApprove?: () => void
 }
-export const PaypalButton = ({ data }: PaypalButtonProps) => {
+export const PaypalButton = ({ onApprove, data }: PaypalButtonProps) => {
   return (
     <PayPalButtons
       style={{
@@ -54,33 +55,24 @@ export const PaypalButton = ({ data }: PaypalButtonProps) => {
           //   (2) Other non-recoverable errors -> Show a failure message
           //   (3) Successful transaction -> Show confirmation or thank you message
 
-          console.log(orderData);
-          const errorDetail = orderData?.details?.[0];
+          // console.log(orderData);
+          // const errorDetail = orderData?.details?.[0];
+          //
+          // if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
+          //   return actions.restart();
+          // } else if (errorDetail) {
+          //   // (2) Other non-recoverable errors -> Show a failure message
+          //   throw new Error(
+          //     `${errorDetail.description} (${orderData.debug_id})`
+          //   );
+          // }
 
-          if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
-            // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-            // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
-            return actions.restart();
-          } else if (errorDetail) {
-            // (2) Other non-recoverable errors -> Show a failure message
-            throw new Error(
-              `${errorDetail.description} (${orderData.debug_id})`
-            );
-          } else {
-            // (3) Successful transaction -> Show confirmation or thank you message
-            // Or go to another URL:  actions.redirect('thank_you.html');
-            const transaction =
-              orderData.purchase_units[0].payments
-                .captures[0];
-            console.log(
-              "Capture result",
-              orderData,
-              JSON.stringify(orderData, null, 2)
-            );
-          }
+          onApprove?.();
         } catch (error) {
           console.error(error);
         }
+
+
       }}
     />
 

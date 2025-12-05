@@ -2,12 +2,12 @@ import { RequestHandler } from "express";
 import { AuthenticatedRequest, routeParamId } from "../types/types";
 import { ShippingValidatorSchema, ShippingValidatorSchemaPartial } from "../validators/Shipping";
 import { validatorError } from "../services/ErrorService";
-import { createShipping, deleteUserShipping, getUserShipping, updateShipping } from "../services/ShippingService";
+import { createShipping, deleteUserShipping, getUserShippings, updateShipping } from "../services/ShippingService";
 
 export const getShipping: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) { return res.sendStatus(401) }
   try {
-    const shippings = await getUserShipping(req.user.id);
+    const shippings = await getUserShippings(req.user.id);
 
     return res.json({
       success: true,

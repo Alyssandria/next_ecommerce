@@ -77,15 +77,24 @@ export default function Checkout() {
         <OrderProducts ids={params.getAll('ids').map(el => Number(el))} />
         {total}
         This is checkout
-        <PaypalButton data={{
-          total,
-          products: items ? items.map(el => ({
-            name: el.productData.title,
-            product_id: el.productData.id,
-            quantity: el.quantity,
-            price: Number(el.productData.price.toFixed(2)),
-          })) : []
-        }} />
+        <PaypalButton
+          onApprove={() => {
+            console.log("Hello?");
+            setTimeout(() => toast.success('Order Successful'));
+
+            setTimeout(() => {
+              router.push('/success');
+            }, 2000)
+          }}
+          data={{
+            total,
+            products: items ? items.map(el => ({
+              name: el.productData.title,
+              product_id: el.productData.id,
+              quantity: el.quantity,
+              price: Number(el.productData.price.toFixed(2)),
+            })) : []
+          }} />
       </div>
     </div>
   )

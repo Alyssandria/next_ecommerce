@@ -61,11 +61,12 @@ export const postOrders: RequestHandler = async (req: AuthenticatedRequest, res,
     return validatorError(res, validated.error);
   }
 
-  const { order_no, products, total } = validated.data
+  const { order_no, products, total, shipping_id } = validated.data
 
   try {
 
     const order = await createOrder(req.user.id, {
+      shipping_id,
       order_no,
       products,
       total,

@@ -21,7 +21,9 @@ export const createShipping = (userId: number, data: ShippingValidator) => {
     province: data.province,
     zip: data.zip
   }).returning({
+    id: shippings.id,
     label: shippings.label,
+    recipient: shippings.recipient,
     street: shippings.street,
     province: shippings.province,
     zip: shippings.zip
@@ -50,7 +52,7 @@ export const updateShipping = (userId: number, id: number, data: ShippingValidat
   })
 }
 
-export const getUserShipping = (userId: number) => {
+export const getUserShippings = (userId: number) => {
   return db.select({
     id: shippings.id,
     label: shippings.label,
@@ -61,4 +63,21 @@ export const getUserShipping = (userId: number) => {
   })
     .from(shippings)
     .where(eq(shippings.userId, userId));
+}
+
+
+export const getUserShipping = (userId: number, id: number) => {
+  return db.select({
+    label: shippings.label,
+    id: shippings.id,
+    recipient: shippings.recipient,
+    street: shippings.street,
+    province: shippings.province,
+    zip: shippings.zip,
+  }).from(shippings).where(
+    and(
+      eq(shippings.id, id),
+      eq(shippings.userId, userId),
+    )
+  );
 }

@@ -1,28 +1,63 @@
 import { RequestHandler } from "express";
 import { captureOrderPayment, createOrderPayment, getOrderDetails } from "../services/PaypalService";
 import { AuthenticatedRequest } from "../types/types";
-import { orderPaymentSchema } from "../validators/Order";
 import { validatorError } from "../services/ErrorService";
 import z from "zod";
 import { createOrder } from "../services/OrderService";
+import { paymentFormValidatorSchema } from "../validators/Order";
+import { createShipping, getUserShipping } from "../services/ShippingService";
 
 export const handleOrderCreate: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {
     return res.sendStatus(401);
   }
 
-  console.log(req.body);
-  const validated = orderPaymentSchema.safeParse(req.body);
+  const validated = paymentFormValidatorSchema.safeParse(req.body);
 
   if (!validated.success) {
     return validatorError(res, validated.error);
   }
 
+  const { type, total, products } = validated.data;
+
+
   try {
+    let shipping = null;
+
+    if (type === "new") {
+      // CREATE NEW
+      shipping = await createShipping(req.user.id, validated.data.shippingDetails);
+    } else {
+      // GET EXISTING
+      shipping = await getUserShipping(req.user.id, validated.data.shipping_id);
+    }
+
+    if (shipping.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          global: false,
+          errors: {
+            fieldErrors: {
+              shipping_id: [
+                "Shipping id provided cannot be found"
+              ],
+            }
+          }
+        }
+      })
+    }
+
     return res.json({
       success: true,
-      data: await createOrderPayment(validated.data)
+      data: await createOrderPayment({
+        shipping_id: shipping[0].id,
+        shippingDetails: shipping[0],
+        total,
+        products
+      })
     });
+
   } catch (error) {
     console.log(error);
     next();
@@ -30,7 +65,7 @@ export const handleOrderCreate: RequestHandler = async (req: AuthenticatedReques
 }
 
 const paymentCaptureParams = z.object({
-  token: z.string()
+  token: z.string().min(17).max(17)
 });
 
 export const handleOrderCapture: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
@@ -60,6 +95,7 @@ export const handleOrderCapture: RequestHandler = async (req: AuthenticatedReque
     console.log(items);
     const order = await createOrder(req.user.id, {
       order_no: token,
+      shipping_id: Number(purchaseUnit.shipping!.address!.adminArea1!),
       products: items.map(el => ({
         name: el.name,
         product_id: Number(el.sku!),

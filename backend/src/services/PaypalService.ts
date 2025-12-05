@@ -1,6 +1,6 @@
-import { ApiResponse, CheckoutPaymentIntent, Client, Environment, LogLevel, OrderRequest, OrdersController, PaymentsController } from "@paypal/paypal-server-sdk";
+import { CheckoutPaymentIntent, Client, Environment, LogLevel, OrderRequest, OrdersController, PaymentsController } from "@paypal/paypal-server-sdk";
 import { env } from "../config/env";
-import { orderPaymentValidator } from "../validators/Order";
+import { PaymentOrderValidator } from "../validators/PaymentOrder";
 
 const client = new Client({
   clientCredentialsAuthCredentials: {
@@ -17,9 +17,8 @@ const client = new Client({
 });
 
 const ordersController = new OrdersController(client);
-const paymentsController = new PaymentsController(client);
 
-export const createOrderPayment = async (data: orderPaymentValidator) => {
+export const createOrderPayment = async (data: PaymentOrderValidator) => {
   const collect: {
     body: OrderRequest
   } = {
@@ -27,6 +26,20 @@ export const createOrderPayment = async (data: orderPaymentValidator) => {
       intent: CheckoutPaymentIntent.Capture,
       purchaseUnits: [
         {
+          shipping: {
+            name: {
+              fullName: data.shippingDetails.recipient
+            },
+            address: {
+              addressLine1: data.shippingDetails.street,
+              addressLine2: data.shippingDetails.province,
+              adminArea1: String(data.shipping_id),
+              adminArea2: data.shippingDetails.province,
+              postalCode: data.shippingDetails.zip,
+              countryCode: "PH"
+            }
+
+          },
           amount: {
             currencyCode: "PHP",
             value: data.total,

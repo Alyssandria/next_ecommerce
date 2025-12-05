@@ -35,8 +35,8 @@ export const shippings = pgTable(
 export const orders = pgTable(
   'orders',
   {
-    userId: integer('user_id').references(() => users.id),
-    shippingId: integer('shipping_id').references(() => shippings.id),
+    userId: integer('user_id').notNull().references(() => users.id),
+    shippingId: integer('shipping_id').notNull().references(() => shippings.id),
     orderNo: varchar('order_no', { length: 18 }).unique().notNull(),
     total: numeric('total', { precision: 10, scale: 2, mode: "string" }).notNull(),
     ...helper
@@ -45,7 +45,7 @@ export const orders = pgTable(
 
 
 export const carts = pgTable('cart_items', {
-  userId: integer("user_id").references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   productId: integer("product_id").notNull(),
   quantity: integer("quantity").notNull(),
   ...helper

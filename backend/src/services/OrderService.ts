@@ -6,6 +6,7 @@ import { OrderValidator } from "../validators/Order";
 export const createOrder = async (userId: number, data: OrderValidator) => {
   return db.transaction(async tx => {
     const [order] = await tx.insert(orders).values({
+      shippingId: data.shipping_id,
       total: data.total,
       userId,
       orderNo: data.order_no
