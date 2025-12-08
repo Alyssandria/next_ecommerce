@@ -19,10 +19,14 @@ export function fetchApi(route: string, opts?: RequestInit) {
     credentials: 'include',
   });
 }
+
+export const getLocalStorage = (item: string) => {
+  return typeof window !== "undefined" ? localStorage.getItem(item) : null;
+
+}
 export async function fetchWithAuth(route: string, opts?: RequestInit) {
   "use client"
-  const { getItem } = useLocalStorage();
-  const token = getItem("token");
+  const token = getLocalStorage("token");
   console.log(token);
 
   if (!token) {
@@ -97,6 +101,11 @@ export const formatCase = (s: string) => {
   )).join(" ");
 }
 
+
+export const setLocalStorage = (key: string, value: string) => {
+  return typeof window !== "undefined" ? localStorage.setItem(key, value) : null;
+}
+
 export async function refreshToken(): Promise<never | string> {
   const refresh = await fetchApi('/auth/refresh', {
     method: "POST"
@@ -108,8 +117,6 @@ export async function refreshToken(): Promise<never | string> {
 
   const json = await refresh.json();
 
-  const { setItem } = useLocalStorage();
-
-  setItem('token', json.token);
+  setLocalStorage('token', json.token);
   return json.token;
 }

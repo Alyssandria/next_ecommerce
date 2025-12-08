@@ -81,7 +81,7 @@ export const postShipping: RequestHandler = async (req: AuthenticatedRequest, re
 
     return res.status(201).json({
       success: true,
-      data: shipping
+      data: shipping[0]
     });
 
   } catch (error) {

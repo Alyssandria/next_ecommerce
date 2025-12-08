@@ -84,3 +84,12 @@ export interface CartItem {
   id: number,
   productData: Product
 }
+
+export interface Shipping {
+  id: number,
+  label: string,
+  zip: string,
+  province: string,
+  street: string,
+  recipient: string,
+}

@@ -32,6 +32,8 @@ export const handleOrderCreate: RequestHandler = async (req: AuthenticatedReques
       shipping = await getUserShipping(req.user.id, validated.data.shipping_id);
     }
 
+    console.log(shipping);
+
     if (shipping.length === 0) {
       return res.status(400).json({
         success: false,
@@ -92,10 +94,9 @@ export const handleOrderCapture: RequestHandler = async (req: AuthenticatedReque
     console.log(result.purchaseUnits);
     const items = purchaseUnit.items!;
 
-    console.log(items);
     const order = await createOrder(req.user.id, {
       order_no: token,
-      shipping_id: Number(purchaseUnit.shipping!.address!.adminArea1!),
+      shipping_id: Number(purchaseUnit.customId),
       products: items.map(el => ({
         name: el.name,
         product_id: Number(el.sku!),

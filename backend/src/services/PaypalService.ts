@@ -19,13 +19,16 @@ const client = new Client({
 const ordersController = new OrdersController(client);
 
 export const createOrderPayment = async (data: PaymentOrderValidator) => {
+  console.log(data);
   const collect: {
     body: OrderRequest
   } = {
     body: {
+
       intent: CheckoutPaymentIntent.Capture,
       purchaseUnits: [
         {
+          customId: String(data.shipping_id),
           shipping: {
             name: {
               fullName: data.shippingDetails.recipient
@@ -33,7 +36,6 @@ export const createOrderPayment = async (data: PaymentOrderValidator) => {
             address: {
               addressLine1: data.shippingDetails.street,
               addressLine2: data.shippingDetails.province,
-              adminArea1: String(data.shipping_id),
               adminArea2: data.shippingDetails.province,
               postalCode: data.shippingDetails.zip,
               countryCode: "PH"

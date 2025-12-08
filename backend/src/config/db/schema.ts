@@ -27,7 +27,7 @@ export const shippings = pgTable(
     street: varchar("street", { length: 256 }).notNull(),
     province: varchar("province", { length: 256 }).notNull(),
     zip: varchar("zip", { length: 4 }).notNull(),
-    userId: integer('user_id').references(() => users.id),
+    userId: integer('user_id').references(() => users.id, { onDelete: "cascade" }),
     ...helper
   }
 )

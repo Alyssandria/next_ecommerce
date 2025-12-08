@@ -15,10 +15,7 @@ export const useProductsByIds = (ids: number[]) => {
         throw new Error("Something went wrong");
       }
 
-      return await res.json() as {
-        success: true,
-        data: CartItem[]
-      };
+      return (await res.json()).data as CartItem[];
     }
   })
 

@@ -4,7 +4,16 @@ import { toast } from "sonner";
 
 interface PaypalButtonProps {
   data: {
+    type: "existing" | "new",
     total: number,
+    shipping_id?: number,
+    shippingDetails?: {
+      label: string,
+      recipient: string,
+      street: string,
+      province: string,
+      zip: string,
+    },
     products: {
       product_id: number,
       price: number,
