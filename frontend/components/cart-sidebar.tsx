@@ -227,15 +227,6 @@ export const CartSidebar = () => {
           >
             Checkout
           </Link>
-          <PaypalButton data={{
-            total,
-            products: selected.map(el => ({
-              name: carts[el].productData.title,
-              product_id: carts[el].productData.id,
-              quantity: carts[el].quantity,
-              price: Number(carts[el].productData.price.toFixed(2)),
-            }))
-          }} />
           <Link href={'carts'} className="w-full text-center underline">View Cart</Link>
         </SheetFooter>
       </SheetContent>

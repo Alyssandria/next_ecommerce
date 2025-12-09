@@ -1,4 +1,5 @@
 import { fetchWithAuth } from "@/lib/utils";
+import { Order } from "@/types";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { toast } from "sonner";
 
@@ -20,7 +21,7 @@ interface PaypalButtonProps {
       quantity: number
     }[]
   },
-  onApprove?: () => void
+  onApprove?: (orderId: string) => void
 }
 export const PaypalButton = ({ onApprove, data }: PaypalButtonProps) => {
   return (
@@ -58,7 +59,7 @@ export const PaypalButton = ({ onApprove, data }: PaypalButtonProps) => {
             }
           );
 
-          const orderData = await response.json();
+          const orderData = (await response.json()).data as Order;
           // Three cases to handle:
           //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
           //   (2) Other non-recoverable errors -> Show a failure message
@@ -76,7 +77,7 @@ export const PaypalButton = ({ onApprove, data }: PaypalButtonProps) => {
           //   );
           // }
 
-          onApprove?.();
+          onApprove?.(orderData.order_no);
         } catch (error) {
           console.error(error);
         }

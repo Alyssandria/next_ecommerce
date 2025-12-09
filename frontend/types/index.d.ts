@@ -93,3 +93,17 @@ export interface Shipping {
   street: string,
   recipient: string,
 }
+
+export interface Order {
+  id: number,
+  shipping_id: number,
+  order_no: string,
+  total: number,
+  products: {
+    price: string,
+    quantity: string,
+    name: string,
+    orderId: string,
+    productId: string
+  }[];
+}

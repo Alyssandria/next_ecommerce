@@ -25,6 +25,7 @@ export const createOrder = async (userId: number, data: OrderValidator) => {
     }));
 
     return {
+      shipping_id: order.shippingId,
       id: order.id,
       order_no: order.orderNo,
       total: Number(order.total),

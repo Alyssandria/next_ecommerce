@@ -1,15 +1,18 @@
 "use client";
 
+import { CartProduct, CartProductCategory, CartProductDelete, CartProductImage, CartProductPrice, CartProductTitle, QuantityHandler } from "@/components/item-products";
+import { PaypalButton } from "@/components/paypal-button";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCreateShippings } from "@/hooks/use-add-shippings";
+import { useProductsByIds } from "@/hooks/use-products-by-id";
 import { useShippings } from "@/hooks/use-shippings";
 import { fetchWithAuth } from "@/lib/utils";
 import { ShippingValidator, ShippingValidatorSchema } from "@/lib/validations/shippingValidators";
-import { Shipping } from "@/types";
+import { CartItem, Shipping } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon, Minus, Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -158,8 +161,8 @@ const AddressFormField = ({
       </Activity>
     </form>
   )
-
 }
+
 export default function Checkout() {
 
   const params = useSearchParams().getAll("ids");
@@ -167,7 +170,37 @@ export default function Checkout() {
 
   const addresses = useShippings();
   const [currAddress, setCurrAddress] = useState<number | undefined>();
+  const [type, setType] = useState<"existing" | "new">(currAddress !== undefined ? "existing" : "new");
   const [isNewShowing, setIsNewShowing] = useState<boolean>(false);
+  const [total, setTotal] = useState<number>(0);
+
+  const items = useProductsByIds(params.map(el => Number(el)));
+  const [products, setProducts] = useState<CartItem[]>(items.data || []);
+  console.log(products);
+
+  useEffect(() => {
+    if (currAddress === undefined) {
+      setType("new");
+    } else {
+      setType("existing");
+    }
+
+  }, [currAddress]); 1
+  useEffect(() => {
+    if (items.data) {
+      setProducts(items.data)
+    }
+  }, [items.data]);
+
+  useEffect(() => {
+    let total = 0;
+
+    products.forEach(el => {
+      total = Number((total + (el.quantity * el.productData.price)).toFixed(2));
+    });
+
+    setTotal(total);
+  }, [products])
 
   const form = useForm<ShippingValidator>({
     resolver: zodResolver(ShippingValidatorSchema),
@@ -178,7 +211,8 @@ export default function Checkout() {
       zip: "",
       recipient: ""
     }
-  })
+  });
+
   // REDIRECT TO CARTS IF THERE'S NO PARAMS
   useEffect(() => {
     if (!params.length) {
@@ -188,8 +222,6 @@ export default function Checkout() {
   }, [])
 
   useEffect(() => {
-    console.log(currAddress);
-    console.log("Address", addresses.data);
     if (!currAddress && addresses.data && addresses.data.length > 0) {
       setCurrAddress(addresses.data[0].id);
     }
@@ -260,6 +292,61 @@ export default function Checkout() {
         :
         <AddressFormField form={form} />
       }
+
+      <div>
+        <span>Order Summarry</span>
+        {products.map(el => (
+          <CartProduct item={el}>
+            <CartProductTitle />
+            <CartProductCategory />
+            <CartProductImage />
+            <CartProductPrice />
+            <CartProductDelete
+              onDelete={(id) => {
+                setProducts(prev => {
+                  return (
+                    prev.filter(x => x.productData.id !== id)
+                  )
+                });
+
+                setTimeout(() => toast.success("Cart item deleted"));
+              }}
+            />
+            <QuantityHandler
+              onQuantityUpdate={(id, qty) => {
+                setProducts(prev => {
+                  return (
+                    prev.map(x => x.productData.id === id ? {
+                      ...x,
+                      quantity: qty
+                    } : x
+                    )
+                  )
+                })
+              }}
+            />
+          </CartProduct>
+        ))}
+      </div>
+
+
+      <PaypalButton data={{
+        total,
+        type,
+
+        shipping_id: currAddress,
+        products: products.map(el => ({
+          name: el.productData.title,
+          product_id: el.productData.id,
+          quantity: el.quantity,
+          price: Number(el.productData.price.toFixed(2)),
+        }))
+      }}
+        onApprove={(orderId) => {
+          toast.success("Order Successfully");
+          router.push(`/order/success/${orderId}`);
+        }}
+      />
     </div>
   )
 
