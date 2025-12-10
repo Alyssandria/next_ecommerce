@@ -397,7 +397,7 @@ export default function Checkout() {
           <div className="w-full flex-1 h-full min-h-[250px]">
             {
               items.isPending ?
-                <div className="size-full bg-blue flex items-center justify-center">
+                <div className="size-full h-32 flex items-center justify-center">
                   <Loader2Icon className="animate-spin" />
                 </div>
                 :
