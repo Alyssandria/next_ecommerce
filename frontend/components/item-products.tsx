@@ -25,7 +25,7 @@ const useCartItemContext = () => {
   return context;
 }
 
-export const CartProduct = ({ children, item }: { item: CartItem } & ComponentProps<"div">) => {
+export const CartProduct = ({ className, children, item, ...props }: { item: CartItem } & ComponentProps<"div">) => {
   const [quantity, setQuantity] = useState<number>(item.quantity);
   return (
     <CartItemContext value={{
@@ -36,7 +36,7 @@ export const CartProduct = ({ children, item }: { item: CartItem } & ComponentPr
       quantity,
       setQuantity
     }}>
-      <div>
+      <div className={cn("w-full", className)} {...props}>
         {children}
       </div>
     </CartItemContext>
@@ -83,7 +83,7 @@ export const CartProductPrice = ({ className, ...props }: ComponentProps<"span">
   const { item } = useCartItemContext();
 
   return (
-    <span className={cn("", className)} {...props} >{formatPrice(item.productData.price)}</span>
+    <span className={cn("font-semibold", className)} {...props} >{formatPrice(item.productData.price)}</span>
   )
 
 }

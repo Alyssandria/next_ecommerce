@@ -18,10 +18,13 @@ export default function CartCheckoutLayout({ children }: { children: ReactNode }
 
   return (
     <div className="p-4">
-      This is cart checkout layout
-      <OrderSteps />
-      <div>
-        {children}
+      <div className="w-full flex justify-center items-center">
+        <OrderSteps />
+      </div>
+      <div className="w-full flex items-center justify-center">
+        <div className="py-8 max-w-[1400px]">
+          {children}
+        </div>
       </div>
     </div>
   )

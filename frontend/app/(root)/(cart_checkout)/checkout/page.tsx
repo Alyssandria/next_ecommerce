@@ -7,10 +7,11 @@ import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from "@/component
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCreateShippings } from "@/hooks/use-add-shippings";
 import { useProductsByIds } from "@/hooks/use-products-by-id";
 import { useShippings } from "@/hooks/use-shippings";
-import { cn, fetchWithAuth, formatCase } from "@/lib/utils";
+import { cn, fetchWithAuth, formatCase, formatPrice } from "@/lib/utils";
 import { ShippingValidator, ShippingValidatorSchema } from "@/lib/validations/shippingValidators";
 import { CartItem, CreateOrderApi, Shipping } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -193,7 +194,6 @@ export default function Checkout() {
 
   const items = useProductsByIds(params.map(el => Number(el)));
   const [products, setProducts] = useState<CartItem[]>(items.data || []);
-  console.log("Products", products);
 
   useEffect(() => {
     if (currAddress === undefined) {
@@ -203,7 +203,6 @@ export default function Checkout() {
     }
 
   }, [currAddress]);
-  console.log(items.data)
 
   useEffect(() => {
     if (items.data) {
@@ -306,17 +305,17 @@ export default function Checkout() {
   }
 
   return (
-    <div>
-
-      <div className="border border-neutral-04 p-4 rounded-lg flex flex-col gap-6">
-        <div className="w-full flex flex-col justify-between">
-          <span className="text-lg font-medium text-neutral-07 block">Shipping Information</span>
+    <div className="grid gap-8 lg:grid-cols-[4fr_1fr]">
+      <div className="border border-neutral-04 p-4 rounded-lg flex flex-col gap-6 md:p-8">
+        <div className="w-full flex flex-col justify-between md:flex-row">
+          <span className="text-xl font-medium text-neutral-07 block">Shipping Information</span>
           <Activity mode={addresses.data && currAddress !== undefined ? "visible" : "hidden"}>
             <Button
               className="text-blue self-start p-0"
               variant={"ghost"}
               onClick={() => {
                 setIsNewShowing(prev => !prev)
+                form.reset();
               }}
             >
               {
@@ -325,113 +324,149 @@ export default function Checkout() {
                   :
                   <Plus />
               }
-
               Add New Address
             </Button>
           </Activity>
         </div>
 
 
-        <div>
+        <div className="h-full flex flex-col">
           {addresses.data && currAddress !== undefined ?
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-8">
-                <RadioGroup
-                  className="text-muted-foreground flex flex-col"
-                  value={currAddress.toString()}
-                  onValueChange={(val) => {
-                    setCurrAddress(Number(val))
-                  }}
-                >
-                  {addresses.data.map((el) => (
-                    <div
-                      className={
-                        cn(
-                          "flex hover:cursor-pointer border border-neutral-03 rounded-lg p-4 items-center gap-3",
-                          el.id === currAddress && "border-blue bg-blue/10"
-                        )}
-                    >
-                      <RadioGroupItem
-                        className="size-6 data-[state=checked]:bg-blue self-start"
-                        value={String(el.id)}
-                        id={String(el.id)}
-                      />
-                      <Label htmlFor={String(el.id)} className="hover:cursor-pointer flex flex-col w-full items-start">
-                        <span className="text-primary">{el.label}</span>
-                        <div className="flex gap-2 text-xs">
-                          <span>{formatCase(el.province)}</span>
-                          <span>{formatCase(el.zip)}</span>
-                        </div>
-                        <span className="text-xs">{formatCase(el.street)}</span>
-                        <span className="text-xs">{formatCase(el.recipient)}</span>
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-                <Activity mode={isNewShowing ? "visible" : "hidden"}>
-                  <div className="border p-4 flex flex-col gap-6">
-                    <span className="font-medium">Create new address</span>
-                    <AddressFormField
-                      form={form}
-                      isNew
-                      onSubmit={(ctx) => {
-                        setIsNewShowing(false);
-                        setCurrAddress(ctx.id);
-                        setTimeout(() => toast.success("Successfully added a new address"));
-                      }}
-                    />
-                  </div>
-                </Activity>
+            <ScrollArea className="h-72 px-6">
+              <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-8">
+                  <RadioGroup
+                    className="text-muted-foreground flex flex-col"
+                    value={currAddress.toString()}
+                    onValueChange={(val) => {
+                      setCurrAddress(Number(val))
+                    }}
+                  >
+                    {addresses.data.map((el) => (
+                      <div
+                        className={
+                          cn(
+                            "flex hover:cursor-pointer border border-neutral-03 rounded-lg p-4 items-center gap-3",
+                            el.id === currAddress && "border-blue bg-blue/10"
+                          )}
+                      >
+                        <RadioGroupItem
+                          className="size-6 data-[state=checked]:bg-blue self-start"
+                          value={String(el.id)}
+                          id={String(el.id)}
+                        />
+                        <Label htmlFor={String(el.id)} className="hover:cursor-pointer flex flex-col w-full items-start">
+                          <span className="text-primary">{el.label}</span>
+                          <div className="flex gap-2 text-xs">
+                            <span>{formatCase(el.province)}</span>
+                            <span>{formatCase(el.zip)}</span>
+                          </div>
+                          <span className="text-xs">{formatCase(el.street)}</span>
+                          <span className="text-xs">{formatCase(el.recipient)}</span>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
               </div>
-            </div>
+            </ScrollArea>
             :
             <AddressFormField form={form} />
           }
+
+          <Activity mode={isNewShowing ? "visible" : "hidden"}>
+            <div className="border p-4 flex flex-col gap-6 rounded-lg">
+              <span className="font-medium">Create new address</span>
+              <AddressFormField
+                form={form}
+                isNew
+                onSubmit={(ctx) => {
+                  setIsNewShowing(false);
+                  setCurrAddress(ctx.id);
+                  setTimeout(() => toast.success("Successfully added a new address"));
+                }}
+              />
+            </div>
+          </Activity>
         </div>
       </div>
 
-      <div>
-        <span>Order Summarry</span>
-        {products.map(el => (
-          <CartProduct item={el}>
-            <CartProductTitle />
-            <CartProductCategory />
-            <CartProductImage />
-            <CartProductPrice />
-            <CartProductDelete
-              onDelete={(id) => {
-                setProducts(prev => {
-                  return (
-                    prev.filter(x => x.productData.id !== id)
-                  )
-                });
+      <div className="border border-neutral-04 rounded-lg p-4 py-8 space-y-8 lg:w-[420px] md:p-8">
+        <span className="text-xl font-medium block">Order Summary</span>
+        <div className="flex flex-col justify-between gap-8">
+          <div className="w-full flex-1 h-full min-h-[250px]">
+            {
+              items.isPending ?
+                <div className="size-full bg-blue flex items-center justify-center">
+                  <Loader2Icon className="animate-spin" />
+                </div>
+                :
+                <div className="space-y-4">
+                  {products.map(el => (
+                    <CartProduct item={el} className="border-b pb-4 gap-2 sm:gap-10 flex">
+                      <div>
+                        <CartProductImage className="h-full" />
+                      </div>
+                      <div className="flex flex-col flex-1">
+                        <div className="w-full flex justify-between items-center">
+                          <CartProductTitle className="max-sm:text-sm" />
+                          <CartProductPrice className="max-sm:text-sm" />
+                        </div>
+                        <div className="w-full flex justify-between items-center">
+                          <CartProductCategory className="max-sm:text-sm" />
+                          <CartProductDelete
+                            onDelete={(id) => {
+                              setProducts(prev => {
+                                return (
+                                  prev.filter(x => x.productData.id !== id)
+                                )
+                              });
 
-                setTimeout(() => toast.success("Cart item deleted"));
-              }}
-            />
-            <QuantityHandler
-              onQuantityUpdate={(id, qty) => {
-                setProducts(prev => {
-                  return (
-                    prev.map(x => x.productData.id === id ? {
-                      ...x,
-                      quantity: qty
-                    } : x
-                    )
-                  )
-                })
-              }}
-            />
-          </CartProduct>
-        ))}
+                              setTimeout(() => toast.success("Cart item deleted"));
+                            }}
+                          />
+                        </div>
+                        <div className="w-full flex justify-between items-center">
+                          <QuantityHandler
+                            onQuantityUpdate={(id, qty) => {
+                              setProducts(prev => {
+                                return (
+                                  prev.map(x => x.productData.id === id ? {
+                                    ...x,
+                                    quantity: qty
+                                  } : x
+                                  )
+                                )
+                              })
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </CartProduct>
+                  ))}
+                </div>
+            }
+          </div>
+
+          <div className="space-y-6">
+            <div className="border-b pb-4 flex justify-between">
+              <span className="">Shipping</span>
+              <span className="font-bold">Free</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-lg font-bold">Total</span>
+              <span className="font-bold">{formatPrice(total)}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <Button
+        className="w-full p-6"
         onClick={() => {
           if (type !== "existing") {
             return form.handleSubmit(handleSubmit)();
           }
-
           createOrder({
             type,
             total,
@@ -444,33 +479,9 @@ export default function Checkout() {
             shipping_id: currAddress
           })
         }}
-      >Place Order
+      >
+        Place Order
       </Button>
-
-
-      <PaypalButton data={{
-        total,
-        type,
-        shipping_id: currAddress,
-        shippingDetails: currAddress === undefined ? {
-          label: form.watch("label"),
-          province: form.watch("province"),
-          recipient: form.watch("recipient"),
-          street: form.watch("street"),
-          zip: form.watch("zip"),
-        } : undefined,
-        products: products.map(el => ({
-          name: el.productData.title,
-          product_id: el.productData.id,
-          quantity: el.quantity,
-          price: Number(el.productData.price.toFixed(2)),
-        }))
-      }}
-        onApprove={(orderId) => {
-          toast.success("Order Successfully");
-          router.push(`/order/success/${orderId}`);
-        }}
-      />
     </div>
   )
 
