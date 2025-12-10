@@ -17,10 +17,12 @@ export default function CartCheckoutLayout({ children }: { children: ReactNode }
   }, [router])
 
   return (
-    <div>
+    <div className="p-4">
       This is cart checkout layout
       <OrderSteps />
-      {children}
+      <div>
+        {children}
+      </div>
     </div>
   )
 }

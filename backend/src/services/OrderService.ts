@@ -34,17 +34,15 @@ export const createOrder = async (userId: number, data: OrderValidator) => {
   });
 }
 
-export const getUserOrder = async (userId: number, id: number) => {
-  return db.select({
-    shipping_id: orders.shippingId,
-    order_no: orders.orderNo,
-    total: orders.total
-  }).from(orders).where(
-    and(
-      eq(orders.userId, userId),
-      eq(orders.id, id)
-    )
-  )
+export const getUserOrder = async (userId: number, orderNo: string) => {
+  return db.query.orders.findFirst({
+    where: (order, { eq, and }) => (
+      and(eq(order.userId, userId), eq(order.orderNo, orderNo))
+    ),
+    with: {
+      products: true
+    }
+  })
 }
 
 export const getUserOrders = async (userId: number) => {

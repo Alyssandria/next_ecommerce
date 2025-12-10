@@ -107,3 +107,25 @@ export interface Order {
     productId: string
   }[];
 }
+
+export interface CreateOrderApi {
+  success: boolean
+  data: Data
+}
+
+export interface Data {
+  result: Result
+  status: number
+}
+
+export interface Result {
+  id: string
+  status: string
+  links: Link[]
+}
+
+export interface Link {
+  href: string
+  rel: string
+  method: string
+}

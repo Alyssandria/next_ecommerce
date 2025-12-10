@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { AuthenticatedRequest, routeParamId } from "../types/types";
+import { AuthenticatedRequest, orderTokenParams, routeParamId } from "../types/types";
 import { orderValidatorSchema } from "../validators/Order";
 import { validatorError } from "../services/ErrorService";
 import { createOrder, getUserOrder, getUserOrders } from "../services/OrderService";
@@ -22,22 +22,24 @@ export const getOrders: RequestHandler = async (req: AuthenticatedRequest, res, 
     next();
   }
 }
+
+
 export const getOrder: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {
     return res.sendStatus(401);
   }
 
-  const param = routeParamId.safeParse(req.params);
+  const param = orderTokenParams.safeParse(req.params);
 
   if (!param.success) {
     return validatorError(res, param.error);
   }
 
-  const { id } = param.data;
+  const { token } = param.data;
 
   try {
 
-    const order = await getUserOrder(req.user.id, id);
+    const order = await getUserOrder(req.user.id, token);
 
     return res.json({
       success: true,

@@ -3,16 +3,16 @@
 import { CartProduct, CartProductCategory, CartProductDelete, CartProductImage, CartProductPrice, CartProductTitle, QuantityHandler } from "@/components/item-products";
 import { PaypalButton } from "@/components/paypal-button";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCreateShippings } from "@/hooks/use-add-shippings";
 import { useProductsByIds } from "@/hooks/use-products-by-id";
 import { useShippings } from "@/hooks/use-shippings";
-import { fetchWithAuth } from "@/lib/utils";
+import { cn, fetchWithAuth, formatCase } from "@/lib/utils";
 import { ShippingValidator, ShippingValidatorSchema } from "@/lib/validations/shippingValidators";
-import { CartItem, Shipping } from "@/types";
+import { CartItem, CreateOrderApi, Shipping } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon, Minus, Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -41,115 +41,132 @@ const AddressFormField = ({
     form.reset();
     onSubmit?.(result);
   }
+
   return (
-    <form onSubmit={form.handleSubmit(submitHandler)}>
-      <Controller
-        name="label"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="label">
-              Address Label
-            </FieldLabel>
-            <Input
-              {...field}
-              id="label"
-              aria-invalid={fieldState.invalid}
-              placeholder="Address Label"
-              autoComplete="off"
-            />
-            {fieldState.invalid && (
-              <FieldError errors={[fieldState.error]} />
+    <form
+      onSubmit={form.handleSubmit(submitHandler)}
+      className="flex flex-col gap-6"
+    >
+      <FieldSet>
+        <FieldGroup className="flex-row justify-between">
+          <Controller
+            name="label"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}
+                className="flex-1"
+              >
+                <FieldLabel htmlFor="label">
+                  Address Label
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="label"
+                  className="max-sm:text-xs"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Label"
+                  autoComplete="off"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
-          </Field>
-        )}
-      />
+          />
 
 
-      <Controller
-        name="recipient"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="recipient">
-              Recipient
-            </FieldLabel>
-            <Input
-              {...field}
-              id="recipient"
-              aria-invalid={fieldState.invalid}
-              placeholder="Recipient"
-            />
-            {fieldState.invalid && (
-              <FieldError errors={[fieldState.error]} />
+          <Controller
+            name="recipient"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}
+                className="flex-1 justify-between"
+              >
+                <FieldLabel htmlFor="recipient">
+                  Recipient
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="recipient"
+                  className="max-sm:text-xs"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Recipient"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
-          </Field>
-        )}
-      />
-      <Controller
-        name="province"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="province">
-              Province
-            </FieldLabel>
-            <Input
-              {...field}
-              id="province"
-              aria-invalid={fieldState.invalid}
-              placeholder="Province"
-            />
-            {fieldState.invalid && (
-              <FieldError errors={[fieldState.error]} />
-            )}
-          </Field>
-        )}
-      />
+          />
+        </FieldGroup>
+        <Controller
+          name="province"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="size-full">
+              <FieldLabel htmlFor="province">
+                Province
+              </FieldLabel>
+              <Input
+                {...field}
+                id="province"
+                className="text-xs  justify-self-end"
+                aria-invalid={fieldState.invalid}
+                placeholder="Province"
+              />
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
 
 
-      <Controller
-        name="street"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="street">
-              Street
-            </FieldLabel>
-            <Input
-              {...field}
-              id="street"
-              aria-invalid={fieldState.invalid}
-              placeholder="Street"
-            />
-            {fieldState.invalid && (
-              <FieldError errors={[fieldState.error]} />
-            )}
-          </Field>
-        )}
-      />
+        <Controller
+          name="street"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="street">
+                Street
+              </FieldLabel>
+              <Input
+                {...field}
+                id="street"
+                className="text-xs"
+                aria-invalid={fieldState.invalid}
+                placeholder="Street"
+              />
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
 
 
-      <Controller
-        name="zip"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="zip">
-              Zip
-            </FieldLabel>
-            <Input
-              {...field}
-              id="zip"
-              aria-invalid={fieldState.invalid}
-              placeholder="Zip"
-            />
-            {fieldState.invalid && (
-              <FieldError errors={[fieldState.error]} />
-            )}
-          </Field>
-        )}
-      />
+        <Controller
+          name="zip"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="zip">
+                Zip
+              </FieldLabel>
+              <Input
+                {...field}
+                id="zip"
+                className="text-xs"
+                aria-invalid={fieldState.invalid}
+                placeholder="Zip"
+              />
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
+      </FieldSet>
       <Activity mode={isNew ? "visible" : "hidden"}>
         <Button type="submit">
           {shippings.isPending ?
@@ -176,7 +193,7 @@ export default function Checkout() {
 
   const items = useProductsByIds(params.map(el => Number(el)));
   const [products, setProducts] = useState<CartItem[]>(items.data || []);
-  console.log(products);
+  console.log("Products", products);
 
   useEffect(() => {
     if (currAddress === undefined) {
@@ -185,7 +202,9 @@ export default function Checkout() {
       setType("existing");
     }
 
-  }, [currAddress]); 1
+  }, [currAddress]);
+  console.log(items.data)
+
   useEffect(() => {
     if (items.data) {
       setProducts(items.data)
@@ -227,71 +246,149 @@ export default function Checkout() {
     }
   }, [addresses.data]);
 
+  const createOrder = async (data: {
+    total: typeof total,
+    type: typeof type,
+    shipping_id?: typeof currAddress
+    shippingDetails?: ShippingValidator,
+    products: {
+      price: number;
+      quantity: number;
+      name: string;
+      product_id: number;
+    }[];
+  }) => {
+    const { total, type, shippingDetails, shipping_id, products } = data;
+    const response = await fetchWithAuth("/payments", {
+      method: "POST",
+      body: JSON.stringify({
+        total,
+        type,
+        shipping_id,
+        shippingDetails,
+        products
+      }),
+    });
+
+    if (!response.ok) {
+      setTimeout(() => toast.error("Something went wrong, please try again later"));
+    }
+
+    const orderData = await response.json() as CreateOrderApi;
+
+    orderData.data.result.links.forEach(el => {
+      if (el.rel === "approve") {
+        window.location.href = el.href;
+      }
+    });
+  }
+
+  const handleSubmit = async (data: ShippingValidator) => {
+    await createOrder(
+      {
+        total,
+        type,
+        shipping_id: currAddress,
+        shippingDetails: currAddress === undefined ? {
+          label: data.label,
+          province: data.province,
+          recipient: data.recipient,
+          street: data.street,
+          zip: data.zip,
+        } : undefined,
+        products: products.map(el => ({
+          name: el.productData.title,
+          product_id: el.productData.id,
+          quantity: el.quantity,
+          price: Number(el.productData.price.toFixed(2)),
+        }))
+      })
+  }
 
   return (
     <div>
-      {addresses.data && currAddress !== undefined ?
-        <div className="flex flex-col gap-4">
-          <div>
-            <div className="w-full flex justify-between">
-              <span>Shipping Information</span>
-              <Button
-                variant={"ghost"}
-                onClick={() => {
-                  setIsNewShowing(prev => !prev)
-                }}
-              >
-                {
-                  isNewShowing ?
-                    <Minus />
-                    :
-                    <Plus />
-                }
-                Add New Address
-              </Button>
-            </div>
-            <RadioGroup
-              className="text-muted-foreground flex flex-col"
-              value={currAddress.toString()}
-              onValueChange={(val) => {
-                setCurrAddress(Number(val))
+
+      <div className="border border-neutral-04 p-4 rounded-lg flex flex-col gap-6">
+        <div className="w-full flex flex-col justify-between">
+          <span className="text-lg font-medium text-neutral-07 block">Shipping Information</span>
+          <Activity mode={addresses.data && currAddress !== undefined ? "visible" : "hidden"}>
+            <Button
+              className="text-blue self-start p-0"
+              variant={"ghost"}
+              onClick={() => {
+                setIsNewShowing(prev => !prev)
               }}
             >
-              {addresses.data.map((el) => (
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem
-                    value={String(el.id)}
-                    id={String(el.id)}
-                  />
-                  <Label htmlFor={String(el.id)} className="flex flex-col items-start">
-                    <span className="text-primary">{el.label}</span>
-                    <div className="flex gap-4">
-                      <span>{el.province}</span>
-                      <span>{el.zip}</span>
-                    </div>
-                    <span>{el.street}</span>
-                    <span>{el.recipient}</span>
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-            <Activity mode={isNewShowing ? "visible" : "hidden"}>
-              <span>Create new address</span>
-              <AddressFormField
-                form={form}
-                isNew
-                onSubmit={(ctx) => {
-                  setIsNewShowing(false);
-                  setCurrAddress(ctx.id);
-                  setTimeout(() => toast.success("Successfully added a new address"));
-                }}
-              />
-            </Activity>
-          </div>
+              {
+                isNewShowing ?
+                  <Minus />
+                  :
+                  <Plus />
+              }
+
+              Add New Address
+            </Button>
+          </Activity>
         </div>
-        :
-        <AddressFormField form={form} />
-      }
+
+
+        <div>
+          {addresses.data && currAddress !== undefined ?
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-8">
+                <RadioGroup
+                  className="text-muted-foreground flex flex-col"
+                  value={currAddress.toString()}
+                  onValueChange={(val) => {
+                    setCurrAddress(Number(val))
+                  }}
+                >
+                  {addresses.data.map((el) => (
+                    <div
+                      className={
+                        cn(
+                          "flex hover:cursor-pointer border border-neutral-03 rounded-lg p-4 items-center gap-3",
+                          el.id === currAddress && "border-blue bg-blue/10"
+                        )}
+                    >
+                      <RadioGroupItem
+                        className="size-6 data-[state=checked]:bg-blue self-start"
+                        value={String(el.id)}
+                        id={String(el.id)}
+                      />
+                      <Label htmlFor={String(el.id)} className="hover:cursor-pointer flex flex-col w-full items-start">
+                        <span className="text-primary">{el.label}</span>
+                        <div className="flex gap-2 text-xs">
+                          <span>{formatCase(el.province)}</span>
+                          <span>{formatCase(el.zip)}</span>
+                        </div>
+                        <span className="text-xs">{formatCase(el.street)}</span>
+                        <span className="text-xs">{formatCase(el.recipient)}</span>
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                <Activity mode={isNewShowing ? "visible" : "hidden"}>
+                  <div className="border p-4 flex flex-col gap-6">
+                    <span className="font-medium">Create new address</span>
+                    <AddressFormField
+                      form={form}
+                      isNew
+                      onSubmit={(ctx) => {
+                        setIsNewShowing(false);
+                        setCurrAddress(ctx.id);
+                        setTimeout(() => toast.success("Successfully added a new address"));
+                      }}
+                    />
+                  </div>
+                </Activity>
+              </div>
+            </div>
+            :
+            <AddressFormField form={form} />
+          }
+        </div>
+      </div>
 
       <div>
         <span>Order Summarry</span>
@@ -329,12 +426,39 @@ export default function Checkout() {
         ))}
       </div>
 
+      <Button
+        onClick={() => {
+          if (type !== "existing") {
+            return form.handleSubmit(handleSubmit)();
+          }
+
+          createOrder({
+            type,
+            total,
+            products: products.map(el => ({
+              name: el.productData.title,
+              product_id: el.productData.id,
+              quantity: el.quantity,
+              price: Number(el.productData.price.toFixed(2)),
+            })),
+            shipping_id: currAddress
+          })
+        }}
+      >Place Order
+      </Button>
+
 
       <PaypalButton data={{
         total,
         type,
-
         shipping_id: currAddress,
+        shippingDetails: currAddress === undefined ? {
+          label: form.watch("label"),
+          province: form.watch("province"),
+          recipient: form.watch("recipient"),
+          street: form.watch("street"),
+          zip: form.watch("zip"),
+        } : undefined,
         products: products.map(el => ({
           name: el.productData.title,
           product_id: el.productData.id,

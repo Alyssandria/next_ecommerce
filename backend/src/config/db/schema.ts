@@ -36,7 +36,7 @@ export const orders = pgTable(
   'orders',
   {
     userId: integer('user_id').notNull().references(() => users.id),
-    shippingId: integer('shipping_id').notNull().references(() => shippings.id),
+    shippingId: integer('shipping_id').notNull().references(() => shippings.id, { onDelete: "cascade" }),
     orderNo: varchar('order_no', { length: 18 }).unique().notNull(),
     total: numeric('total', { precision: 10, scale: 2, mode: "string" }).notNull(),
     ...helper
@@ -89,6 +89,7 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
     fields: [orders.userId],
     references: [shippings.id]
   }),
+  products: many(orderProducts)
 }));
 
 export const userRelations = relations(users, ({ many }) => ({

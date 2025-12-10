@@ -15,6 +15,13 @@
       "when": 1765211955560,
       "tag": "0001_mean_surge",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765284625163,
+      "tag": "0002_familiar_frank_castle",
+      "breakpoints": true
     }
   ]
 }

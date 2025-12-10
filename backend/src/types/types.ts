@@ -26,6 +26,10 @@ export const routeParamId = z.object({
   id: z.string().regex(/^\d+$/, "Invalid Type. Must be a valid user id").transform(val => Number(val))
 });
 
+export const orderTokenParams = z.object({
+  token: z.string().min(17).max(17)
+});
+
 export interface credentials extends JwtPayload {
   email: string,
   id: number

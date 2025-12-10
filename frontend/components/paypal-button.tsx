@@ -24,6 +24,7 @@ interface PaypalButtonProps {
   onApprove?: (orderId: string) => void
 }
 export const PaypalButton = ({ onApprove, data }: PaypalButtonProps) => {
+
   return (
     <PayPalButtons
       style={{

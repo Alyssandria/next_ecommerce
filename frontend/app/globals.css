@@ -47,6 +47,7 @@
   --color-neutral-02: oklch(0.9692 0.0034 247.86);
   --color-neutral-01: oklch(0.997 0 0);
   --color-green: oklch(0.7498 0.1556 158.92);
+  --color-blue: oklch(0.6179 0.2063 261.39);
   --color-orange: oklch(0.8034 0.1704 73.79);
 }
 
@@ -58,6 +59,7 @@
   --neutral-05: oklch(0.3372 0.0058 214.37);
   --neutral-02: oklch(0.9692 0.0034 247.86);
   --neutral-01: oklch(0.997 0 0);
+  --blue: : oklch(0.6179 0.2063 261.39);
   --green: oklch(0.7498 0.1556 158.92);
   --radius: 0.625rem;
   --background: oklch(1 0 0);

@@ -26,6 +26,10 @@ export const createOrderPayment = async (data: PaymentOrderValidator) => {
     body: {
 
       intent: CheckoutPaymentIntent.Capture,
+      applicationContext: {
+        cancelUrl: "http://localhost:3000/carts",
+        returnUrl: "http://localhost:3000/checkout/success"
+      },
       purchaseUnits: [
         {
           customId: String(data.shipping_id),

@@ -1,11 +1,12 @@
 import { RequestHandler } from "express";
 import { captureOrderPayment, createOrderPayment, getOrderDetails } from "../services/PaypalService";
-import { AuthenticatedRequest } from "../types/types";
+import { AuthenticatedRequest, orderTokenParams } from "../types/types";
 import { validatorError } from "../services/ErrorService";
-import z from "zod";
-import { createOrder } from "../services/OrderService";
+import { createOrder, getUserOrder } from "../services/OrderService";
 import { paymentFormValidatorSchema } from "../validators/Order";
 import { createShipping, getUserShipping } from "../services/ShippingService";
+import { ApiError } from "@paypal/paypal-server-sdk";
+import { success } from "zod";
 
 export const handleOrderCreate: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {
@@ -66,9 +67,6 @@ export const handleOrderCreate: RequestHandler = async (req: AuthenticatedReques
   }
 }
 
-const paymentCaptureParams = z.object({
-  token: z.string().min(17).max(17)
-});
 
 export const handleOrderCapture: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
   if (!req.user) {
@@ -76,7 +74,7 @@ export const handleOrderCapture: RequestHandler = async (req: AuthenticatedReque
   }
 
 
-  const validated = paymentCaptureParams.safeParse(req.params);
+  const validated = orderTokenParams.safeParse(req.params);
 
   if (!validated.success) {
     return validatorError(res, validated.error);
@@ -86,8 +84,9 @@ export const handleOrderCapture: RequestHandler = async (req: AuthenticatedReque
 
   try {
     const captured = await captureOrderPayment(token);
-
+    console.log("Hey");
     const { result, status } = await getOrderDetails(captured.result.id!);
+
 
     const purchaseUnit = result.purchaseUnits![0];
 
@@ -112,7 +111,16 @@ export const handleOrderCapture: RequestHandler = async (req: AuthenticatedReque
       data: order
     });
   } catch (error) {
-    console.log(error);
+    if (error instanceof ApiError) {
+      if (error.result.details[0].issue === "ORDER_ALREADY_CAPTURED") {
+        const order = await getUserOrder(req.user.id, token);
+        return res.json({
+          success: true,
+          data: order
+        });
+
+      }
+    }
     next();
   }
 }
