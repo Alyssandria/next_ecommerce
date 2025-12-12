@@ -15,7 +15,7 @@ import { cn, fetchWithAuth, formatCase, formatPrice } from "@/lib/utils";
 import { ShippingValidator, ShippingValidatorSchema } from "@/lib/validations/shippingValidators";
 import { CartItem, CreateOrderApi, Shipping } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2Icon, Minus, Plus } from "lucide-react";
+import { Loader2Icon, Minus, Plus, XIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Activity, useEffect, useState } from "react";
 import { Controller, useForm, UseFormReturn } from "react-hook-form";
@@ -305,7 +305,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[4fr_1fr]">
+    <div className="grid gap-8 lg:grid-cols-[4fr_1fr] max-w-[1400px] ">
       <div className="border border-neutral-04 p-4 rounded-lg flex flex-col gap-6 md:p-8">
         <div className="w-full flex flex-col justify-between md:flex-row">
           <span className="text-xl font-medium text-neutral-07 block">Shipping Information</span>
@@ -391,7 +391,7 @@ export default function Checkout() {
         </div>
       </div>
 
-      <div className="border border-neutral-04 rounded-lg p-4 py-8 space-y-8 lg:w-[420px] md:p-8">
+      <div className="h-fit border border-neutral-04 rounded-lg p-4 py-8 space-y-8 lg:w-[420px] md:p-8">
         <span className="text-xl font-medium block">Order Summary</span>
         <div className="flex flex-col justify-between gap-8">
           <div className="w-full flex-1 h-full min-h-[250px]">
@@ -424,7 +424,10 @@ export default function Checkout() {
 
                               setTimeout(() => toast.success("Cart item deleted"));
                             }}
-                          />
+                          >
+                            <XIcon />
+                          </CartProductDelete>
+
                         </div>
                         <div className="w-full flex justify-between items-center">
                           <QuantityHandler

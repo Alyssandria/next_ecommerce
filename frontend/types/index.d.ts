@@ -94,18 +94,21 @@ export interface Shipping {
   recipient: string,
 }
 
+export interface OrderProduct {
+  price: number,
+  quantity: number,
+  name: string,
+  order_id: number,
+  product_data: Product
+}
+
 export interface Order {
   id: number,
   shipping_id: number,
   order_no: string,
   total: number,
-  products: {
-    price: string,
-    quantity: string,
-    name: string,
-    orderId: string,
-    productId: string
-  }[];
+  date: string,
+  products: OrderProduct[];
 }
 
 export interface CreateOrderApi {

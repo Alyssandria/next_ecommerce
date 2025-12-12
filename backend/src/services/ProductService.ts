@@ -26,7 +26,7 @@ export const fetchProductsById = async (ids: number[]) => {
   const reqs: Promise<Response>[] = [];
 
   for (const id of ids) {
-    reqs.push(fetch(`${env.BASE_PRODUCTS_API}/${id}`, { signal: AbortSignal.timeout(10000) }));
+    reqs.push(fetch(`${env.BASE_PRODUCTS_API}/${id}`));
   }
 
   return Promise.all(reqs);

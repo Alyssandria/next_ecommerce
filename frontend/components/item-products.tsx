@@ -46,7 +46,7 @@ export const CartProduct = ({ className, children, item, ...props }: { item: Car
 export const CartProductTitle = ({ className, ...props }: ComponentProps<"span">) => {
   const { item } = useCartItemContext();
   return (
-    <span className={cn("block font-bold text-lg max-w-[12ch] truncate", className)} {...props}>{item.productData.title}</span>
+    <span className={cn("block font-semibold text-lg max-w-[12ch] truncate", className)} {...props}>{item.productData.title}</span>
   )
 }
 
@@ -59,20 +59,19 @@ export const CartProductCategory = ({ className, ...props }: ComponentProps<"spa
 
 }
 
-export const CartProductDelete = ({ onDelete, className, ...props }: { onDelete?: (id: number) => void } & ComponentProps<typeof Button>) => {
+export const CartProductDelete = ({ onDelete, className, children, ...props }: { onDelete?: (id: number) => void } & ComponentProps<typeof Button>) => {
   const { item } = useCartItemContext();
 
   return (
     <Button
       variant={"ghost"}
-      size={"icon-lg"}
-      className="text-muted-foreground"
+      className={cn("text-muted-foreground", className)}
       onClick={() => {
         onDelete?.(item.productData.id);
       }}
       {...props}
     >
-      <XIcon />
+      {children}
     </Button>
   )
 
@@ -134,7 +133,7 @@ export const QuantityHandler = (
       >
         <Minus />
       </Button>
-      <span>{context.quantity}</span>
+      <span className="font-medium">{context.quantity}</span>
       <Button
         variant="ghost" size={"icon-lg"}
         onClick={() => {

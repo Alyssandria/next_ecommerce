@@ -83,14 +83,22 @@ export const handleOrderCapture: RequestHandler = async (req: AuthenticatedReque
   const { token } = validated.data;
 
   try {
+
+    const existing = await getUserOrder(req.user.id, token);
+
+    if (existing) {
+      return res.json({
+        success: true,
+        data: existing
+      });
+    }
+
     const captured = await captureOrderPayment(token);
-    console.log("Hey");
     const { result, status } = await getOrderDetails(captured.result.id!);
 
 
     const purchaseUnit = result.purchaseUnits![0];
 
-    console.log(result.purchaseUnits);
     const items = purchaseUnit.items!;
 
     const order = await createOrder(req.user.id, {

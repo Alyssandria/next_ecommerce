@@ -89,6 +89,19 @@ export async function logout() {
   return redirect('/login');
 }
 
+export const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  const formatted = date.toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+
+  return formatted;
+
+}
+
 export const formatCase = (s: string) => {
   const split = s.split(" ");
 

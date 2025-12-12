@@ -22,7 +22,7 @@ export default function CartCheckoutLayout({ children }: { children: ReactNode }
         <OrderSteps />
       </div>
       <div className="w-full flex items-center justify-center">
-        <div className="py-8 max-w-[1400px]">
+        <div className="w-full py-8 flex items-center justify-center">
           {children}
         </div>
       </div>
