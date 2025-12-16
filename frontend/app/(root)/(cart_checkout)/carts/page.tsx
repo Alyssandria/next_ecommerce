@@ -86,7 +86,7 @@ export default function CartsPage() {
           <span className="block font-medium">Product</span>
           <span className="max-md:hidden block font-medium col-start-4">Quantity</span>
           <span className="max-md:hidden block font-medium text-center col-start-5">Price</span>
-          <span className="max-md:hidden block font-medium text-right col-start-6">Subtotal</span>
+          <span className="hidden md:block font-medium text-right col-start-6">Subtotal</span>
         </div>
         <div
           style={{
@@ -126,9 +126,9 @@ export default function CartsPage() {
                   <CartProductTitle className="text-base" />
                   <CartProductPrice className="text-base text-right md:text-center md:self-center md:col-start-5 md:row-start-2" />
                   <CartProductSubtotal className="max-md:hidden text-base text-right md:self-center md:col-start-6 md:row-start-2" />
-                  <CartProductCategory className="max-sm:text-sm self-center md:col-start-3" />
+                  <CartProductCategory className="max-sm:text-sm self-center col-start-3" />
                   <CartProductDelete
-                    className="max-md:justify-self-end md:justify-start md:px-0 md:col-start-3 w-fit"
+                    className="max-md:justify-self-end md:justify-start md:px-0 col-start-4 md:col-start-3 w-fit"
                     onDelete={() => {
                       itemDelete.mutate({
                         ids: [item.id]
@@ -149,7 +149,7 @@ export default function CartsPage() {
                     onQuantityUpdate={(id, qty) => {
                       updateQuantity.mutate({ id, quantity: qty });
                     }}
-                    className="col-span-2 border rounded-md border-neutral-04 md:col-start-4 md:row-start-2" />
+                    className="max-md:col-span-2 border rounded-md border-neutral-04 md:col-start-4 md:row-start-2" />
                 </CartProduct>
               </div>
             )

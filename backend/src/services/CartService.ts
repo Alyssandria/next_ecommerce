@@ -69,7 +69,7 @@ export const getCartItemsById = async (userId: number, ids: number[]) => {
     )
   )
 
-  const promises = await fetchProductsById(items.map(el => el.id));
+  const promises = await fetchProductsById(items.map(el => el.productId));
 
   const json = await Promise.all(promises.map(el => el.json()));
 
