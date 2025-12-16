@@ -220,6 +220,8 @@ export default function Checkout() {
     setTotal(total);
   }, [products])
 
+  console.log(products);
+
   const form = useForm<ShippingValidator>({
     resolver: zodResolver(ShippingValidatorSchema),
     defaultValues: {
@@ -394,7 +396,7 @@ export default function Checkout() {
       <div className="h-fit border border-neutral-04 rounded-lg p-4 py-8 space-y-8 lg:w-[420px] md:p-8">
         <span className="text-xl font-medium block">Order Summary</span>
         <div className="flex flex-col justify-between gap-8">
-          <div className="w-full flex-1 h-full min-h-[250px]">
+          <ScrollArea className="h-48 overflow-x-hidden">
             {
               items.isPending ?
                 <div className="size-full h-32 flex items-center justify-center">
@@ -434,7 +436,7 @@ export default function Checkout() {
                             onQuantityUpdate={(id, qty) => {
                               setProducts(prev => {
                                 return (
-                                  prev.map(x => x.productData.id === id ? {
+                                  prev.map(x => x.id === id ? {
                                     ...x,
                                     quantity: qty
                                   } : x
@@ -449,7 +451,7 @@ export default function Checkout() {
                   ))}
                 </div>
             }
-          </div>
+          </ScrollArea>
 
           <div className="space-y-6">
             <div className="border-b pb-4 flex justify-between">
