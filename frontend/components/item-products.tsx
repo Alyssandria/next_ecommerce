@@ -88,6 +88,16 @@ export const CartProductPrice = ({ className, ...props }: ComponentProps<"span">
 }
 
 
+export const CartProductSubtotal = ({ className, ...props }: ComponentProps<"span">) => {
+  const { item } = useCartItemContext();
+
+  return (
+    <span className={cn("font-semibold", className)} {...props} >{formatPrice(item.productData.price * item.quantity)}</span>
+  )
+
+}
+
+
 export const CartProductImage = ({ className, ...props }: ComponentProps<"div">) => {
   const { item } = useCartItemContext();
 
@@ -119,7 +129,7 @@ export const QuantityHandler = (
 ) => {
   const context = useCartItemContext();
   useEffect(() => {
-    onQuantityUpdate?.(context.item.productData.id, context.quantity);
+    onQuantityUpdate?.(context.item.id, context.quantity);
   }, [context.quantity])
 
   return (

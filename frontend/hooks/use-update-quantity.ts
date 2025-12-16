@@ -19,8 +19,8 @@ export const useUpdateQuantity = () => {
 
       return await res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['carts'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['carts'] });
     }
   })
 }
