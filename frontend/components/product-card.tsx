@@ -7,8 +7,7 @@ import {
 import { ComponentProps } from "react";
 import Image from "next/image";
 import { ProductRating } from "./product-rating";
-import { calculateOriginalPrice, formatPrice } from "@/lib/utils";
-import { Button } from "./ui/button";
+import { calculateOriginalPrice, cn, formatPrice } from "@/lib/utils";
 import { AddToCart } from "./add-to-cart";
 
 
@@ -16,14 +15,16 @@ interface ProductCardProps extends ComponentProps<"div"> {
   data: Product
   onCartAdd?: () => void;
 }
-export const ProductCard = ({ onCartAdd, data }: ProductCardProps) => {
+export const ProductCard = ({ className, onCartAdd, data }: ProductCardProps) => {
   return (
-    <Card className="pt-0">
-      <CardContent className="bg-[#F3F5F7] relative py-6">
+    <Card className={cn("pt-0 w-full max-w-[262px]", className)}>
+      <CardContent className="w-full bg-[#F3F5F7] relative py-6">
         <div className="bg-green w-fit px-4 py-1 rounded-sm font-bold text-white">
           <span>-{Math.floor(data.discountPercentage)}%</span>
         </div>
-        <Image src={data.thumbnail} width={800} height={600} alt="Product Image" />
+        <div className="w-full flex justify-center items-center">
+          <Image src={data.thumbnail} width={800} height={600} alt="Product Image" className="w-full object-cover" />
+        </div>
         <div className="absolute flex items-center justify-center left-0 bottom-6 w-full px-6">
           <AddToCart onCartAdd={onCartAdd} productID={data.id}>Add to cart</AddToCart>
         </div>
