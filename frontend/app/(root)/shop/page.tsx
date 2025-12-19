@@ -8,11 +8,15 @@ import { useProducts } from "@/hooks/use-products";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group";
-import { ChevronDown, Columns2, Grid3x3, Rows2, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Columns2, Grid3x3, Loader2Icon, Rows2, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useProductCategories } from "@/hooks/use-product-category";
+import Link from "next/link";
+import { Category } from "@/types";
+import { keyof } from "zod";
 
 
 const COLUMNS = {
@@ -33,7 +37,24 @@ const COLUMNS = {
   },
 } as const;
 
+
+const SORT_OPTIONS: {
+  id: number,
+  label: string,
+  sortBy: string,
+  order: "asc" | "desc",
+}[] = [
+  { id: 1, label: "Name: A–Z", sortBy: "title", order: "asc" },
+  { id: 2, label: "Name: Z–A", sortBy: "title", order: "desc" },
+  { id: 3, label: "Price: Low to High", sortBy: "price", order: "asc" },
+  { id: 4, label: "Price: High to Low", sortBy: "price", order: "desc" },
+] as const;
+
 export default function ShopPage() {
+  const categories = useProductCategories();
+  const [category, setCategory] = useState<Category>({ name: "All Products", slug: "all" });
+
+  const [sortOptions, setSortOptions] = useState<typeof SORT_OPTIONS[0]>(SORT_OPTIONS[0]);
   const {
     data,
     error,
@@ -41,7 +62,8 @@ export default function ShopPage() {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useProducts();
+  } = useProducts(sortOptions.sortBy, sortOptions.order, category.slug);
+
 
   const scrollableRef = useRef<HTMLDivElement | null>(null);
   const isTablet = useMediaQuery('(min-width: 48rem)');
@@ -103,8 +125,6 @@ export default function ShopPage() {
     }
   }, [error]);
 
-  if (isPending) return <div>Loading...</div>;
-  if (error) return <div>Error loading products</div>;
 
   return (
     <div className="p-4 md:p-8 flex flex-col gap-4 max-w-[1440px] md:gap-10 m-auto">
@@ -151,7 +171,7 @@ export default function ShopPage() {
 
         <div className="flex items-center justify-between">
           {isTablet ?
-            <span className="block text-lg font-medium md:col-start-2">Living Room</span>
+            <span className="block text-lg font-medium md:col-start-2">{category.name}</span>
             :
             <Dialog>
               <DialogTrigger className="flex-1 flex w-fit gap-2 items-center">
@@ -170,25 +190,74 @@ export default function ShopPage() {
             </Dialog>
           }
 
-          <Select>
-            <SelectTrigger className="w-fit border-none shadow-none flex justify-end [&>span]:text-primary [&>span]:text-lg">
-              <SelectValue placeholder="Sort By" className="text-primary" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="asc">Ascending</SelectItem>
-              <SelectItem value="desc">Descending</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <span className="block text-lg">Sort By</span>
+            <Select
+              value={String(sortOptions.id)}
+              onValueChange={(val) => {
+                setSortOptions(SORT_OPTIONS.find(el => Number(val) === el.id)!);
+              }}
+            >
+              <SelectTrigger className="w-fit border-none shadow-none flex justify-end [&>span]:text-neutral-04 [&>span]:text-base hover:cursor-pointer">
+                <SelectValue placeholder="Sort By" className="text-primary" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map(el => (
+                  <SelectItem value={String(el.id)}>{el.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
-      <div className="w-full flex">
+      <div className="w-full flex gap-8">
         <div className="flex-1 max-md:hidden">
-          <ScrollArea className="max-h-40">
+          <div className="flex flex-col gap-4">
             <span className="block text-lg font-medium">Categories</span>
-          </ScrollArea>
+            <ScrollArea className=" max-h-40 overflow-y-auto">
+              <div className="flex flex-col gap-2">
+                <Link href={{
+                  pathname: "/shop"
+                }}
+                  onClick={() => {
+                    setCategory({
+                      name: "All Products",
+                      slug: "all"
+                    })
+                  }}
+                  className={
+                    cn(
+                      "block w-fit text-muted-foreground",
+                      category.slug === "all" && "border-b-2 border-primary text-primary"
+                    )
+                  }
+                >
+                  <span>All Products</span>
+                </Link>
+                {categories.data?.map(el => (
+                  <Link href={{
+                    pathname: "/shop"
+                  }}
+                    onClick={() => {
+                      setCategory(el)
+                    }}
+                    className={
+                      cn(
+                        "block w-fit text-muted-foreground",
+                        category.slug === el.slug && "border-b-2 border-primary text-primary"
+                      )
+                    }
+                  >
+                    <span>{el.name}</span>
+                  </Link>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
         </div>
 
+        {isPending && <Loader2Icon className="animate-spin" />}
         <div
           ref={scrollableRef}
           className="flex-4/6 h-[calc(100vh-80px)] overflow-y-auto"
@@ -241,6 +310,6 @@ export default function ShopPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

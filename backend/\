@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
-import { fetchCategories, fetchProducts } from "../services/ProductService";
+import { fetchCategories, fetchProducts, fetchProductsById } from "../services/ProductService";
 import { validatorError } from "../services/ErrorService";
-import { AuthenticatedRequest, ProductPaginatedQueryParams } from "../types/types";
+import { AuthenticatedRequest, getPaginationQuery, ProductPaginatedQueryParams } from "../types/types";
 import z from "zod";
 import { getCartItemsById } from "../services/CartService";
 
@@ -13,12 +13,13 @@ export const getProducts: RequestHandler = async (req, res) => {
     return validatorError(res, validated.error);
   }
 
-  const { limit, skip, category, order, search, sortBy } = validated.data;
+  const { limit, skip, category, order, search } = validated.data;
 
+  console.log(category);
 
   return res.json({
     success: true,
-    data: await fetchProducts(limit, skip, sortBy, order, category, search)
+    data: await fetchProducts(limit, skip, category, order, search)
   });
 }
 
